@@ -22,14 +22,17 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") as String}\"")
+            buildConfigField(
+                "String", "API_KEY", "\"${project.findProperty("API_KEY") as String}\""
+            )
         }
         release {
-            buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") as String}\"")
+            buildConfigField(
+                "String", "API_KEY", "\"${project.findProperty("API_KEY") as String}\""
+            )
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -89,4 +92,20 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
+
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
+
+    //Serialization for NavArgs
+    val nav_version = "2.8.8"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+
+    //lottie file
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
+
+
 }
