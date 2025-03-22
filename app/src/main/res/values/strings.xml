@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">SkySnap Project</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">Arabic</string>
+    <string name="language_label">Language</string>
+    <string name="units_label">Units</string>
+    <string name="units_c">Celsius</string>
+    <string name="units_k">kelvin</string>
+    <string name="units_F">Fahrenheit</string>
+    <string name="fav_header">Favourite Locations</string>
+    <string name="set_header">Settings</string>
+    <string name="location_gps">GPS</string>
+    <string name="location_map">Map</string>
+    <string name="location_label">Location</string>
+    <string name="navhome">Home</string>
+    <string name="navfav">Favorite</string>
+    <string name="navalarm">Alarm</string>
+    <string name="navsettings">Settings</string>
+
 </resources>

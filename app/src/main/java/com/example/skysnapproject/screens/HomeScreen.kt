@@ -1,122 +1,32 @@
-package com.example.skysnapproject
+package com.example.skysnapproject.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.airbnb.lottie.compose.*
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import kotlinx.coroutines.delay
-
-@Composable
-fun SplashScreen(navController: NavController) {
-    GradientBackground()
-
-    val alpha = remember {
-        Animatable(0f)
-    }
-
-
-    LaunchedEffect(key1 = true) {
-        alpha.animateTo(
-            1f,
-            animationSpec = tween(2400)
-        )
-        delay(200)
-        navController.popBackStack()
-        navController.navigate("Home")
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        LoaderAnimation(
-            modifier = Modifier.size(400.dp),
-            anmi = R.raw.splashrain
-        )
-        Spacer(modifier = Modifier.height(25.dp))
-        Text(
-            text = "Discover weather around you!",
-            modifier = Modifier.alpha(alpha.value),
-            fontSize = 28.sp
-        )
-    }
-}
-
-@Composable
-fun LoaderAnimation(modifier: Modifier, anmi: Int) {
-    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(anmi))
-
-    LottieAnimation(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun GradientBackground() {
-    val gradientColors = listOf(
-        Color(0xFF6DD5FA),
-        Color(0xFF9C27B0)
-    )
-    val gradientBrush = Brush.verticalGradient(
-        colors = gradientColors,
-        startY = 0f,
-        endY = Float.POSITIVE_INFINITY
-    )
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradientBrush)
-    ) {}
-}
-
+import com.example.skysnapproject.R
 
 /*
 //@Preview
@@ -254,12 +164,13 @@ fun HomeScreen() {
 */
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(paddingValues: PaddingValues) {
     GradientBackground()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 70.dp, start = 10.dp, end = 10.dp),
+            .padding(top = 70.dp, start = 10.dp, end = 10.dp)
+        .padding(bottom = paddingValues.calculateBottomPadding()),
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -348,7 +259,7 @@ fun HomeScreen() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(5) { index ->
-                    FancyItemCard(
+                    HomeColumnItemCard(
                         imageRes = R.drawable.simg,
                         time = "Time $index",
                         temp = "tmp $index"
@@ -365,7 +276,7 @@ fun HomeScreen() {
         }
 
         items(5) { index ->
-            FancyRowItemCard(
+            HomeRowItemCard(
                 imageRes = R.drawable.simg,
                 time = "Time $index",
                 temp = "tmp $index"
@@ -389,7 +300,7 @@ fun WeatherData(key: String, value: String) {
 
 
 @Composable
-fun FancyItemCard(imageRes: Int, time: String, temp: String) {
+fun HomeColumnItemCard(imageRes: Int, time: String, temp: String) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(4.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
@@ -415,7 +326,7 @@ fun FancyItemCard(imageRes: Int, time: String, temp: String) {
     }
 }
 @Composable
-fun FancyRowItemCard(imageRes: Int, time: String, temp: String) {
+fun HomeRowItemCard(imageRes: Int, time: String, temp: String) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(4.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
@@ -442,4 +353,5 @@ fun FancyRowItemCard(imageRes: Int, time: String, temp: String) {
 
     }
 }
+
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkySnap Project</string>
+    <string name="language_english">الانجليزيه</string>
+    <string name="language_arabic">العربيه</string>
+    <string name="language_label">اللغه</string>
+    <string name="units_label">وحده درجه الحراره</string>
+    <string name="units_c">درجه مئويه</string>
+    <string name="units_k">كيلفن</string>
+    <string name="units_F">فيهرانيت</string>
+    <string name="fav_header">المواقع المفضله</string>
+    <string name="set_header">الاعدادات</string>
+    <string name="location_gps">نظام تحديد الموقع</string>
+    <string name="location_map">الخريطه</string>
+    <string name="location_label">الموقع</string>
+    <string name="navhome">الرئيسيه</string>
+    <string name="navfav">المفضله</string>
+    <string name="navalarm">التنبيه</string>
+    <string name="navsettings">الاعدادات</string>
+</resources>
