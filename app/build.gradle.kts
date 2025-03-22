@@ -107,5 +107,18 @@ dependencies {
     //lottie file
     implementation("com.airbnb.android:lottie-compose:6.3.0")
 
+    //matrial
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
+
+    /*    //loading Network image
+        implementation("io.coil-kt:coil-compose:2.4.0")
+
+        //fonts
+        implementation("com.git.Gurupreet:FontAwesomeCompose:1.0.0")
+
+        //fullLayout
+
+        implementation("com.google.accompanist:accompanist-systemuicontroller:0.33.1-alpha")*/
+
 
 }
