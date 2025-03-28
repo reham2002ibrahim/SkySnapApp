@@ -2,6 +2,7 @@ package com.example.skysnapproject.locationFeatch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
+import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,5 +33,35 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
         object Loading : WeatherState()
         data class Success(val weatherData: CurrentWeather) : WeatherState()
         data class Error(val message: String) : WeatherState()
+    }
+
+
+
+
+   //  ******* forecast data
+    private val _forecastState = MutableStateFlow<ForecastState>(ForecastState.Empty)
+    val forecastState: StateFlow<ForecastState> = _forecastState
+
+    fun getForecast(city: String) {
+        viewModelScope.launch {
+            _forecastState.value = ForecastState.Loading
+            try {
+                val response = repository.getForecast(city)
+                if (response.isSuccessful && response.body() != null) {
+                    _forecastState.value = ForecastState.Success(response.body()!!)
+                } else {
+                    _forecastState.value = ForecastState.Error("Failed to get forecast")
+                }
+            } catch (e: Exception) {
+                _forecastState.value = ForecastState.Error(e.message ?: "chached error")
+            }
+        }
+    }
+
+    sealed class ForecastState {
+        object Empty : ForecastState()
+        object Loading : ForecastState()
+        data class Success(val forecastData: Forecast) : ForecastState()
+        data class Error(val message: String) : ForecastState()
     }
 }

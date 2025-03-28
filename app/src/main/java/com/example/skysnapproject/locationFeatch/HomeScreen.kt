@@ -1,19 +1,24 @@
 package com.example.skysnapproject.locationFeatch
 
 import android.icu.text.SimpleDateFormat
-import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -32,48 +37,53 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-//import com.bumptech.glide.integration.compose.GlideImage
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
+import com.example.skysnapproject.dataLayer.forecastModel.Forecast
+import com.example.skysnapproject.dataLayer.forecastModel.ForecastItem
 import com.example.skysnapproject.screens.GradientBackground
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun HomeScreen(viewModel: WeatherViewModel) {
-
-
     val context = LocalContext.current
     val locationManager = remember { LocationManager(context) }
     val weatherState by viewModel.weatherState.collectAsState()
+    val forecastState by viewModel.forecastState.collectAsState()
 
     LaunchedEffect(Unit) {
         locationManager.fetchLocation()
         locationManager.currentCity?.let { city ->
             viewModel.getCurrentWeather(city)
+            viewModel.getForecast(city)
         }
     }
 
-
     GradientBackground()
 
-    when (weatherState) {
-        is WeatherViewModel.WeatherState.Loading -> LoadingScreen()
-        is WeatherViewModel.WeatherState.Success -> {
+    when {
+        weatherState is WeatherViewModel.WeatherState.Loading -> LoadingScreen()
+        weatherState is WeatherViewModel.WeatherState.Success -> {
             val weather = (weatherState as WeatherViewModel.WeatherState.Success).weatherData
-            WeatherContent(weather)
+            val forecast = (forecastState as? WeatherViewModel.ForecastState.Success)?.forecastData
+
+            WeatherContent(weather, forecast)
         }
 
-        is WeatherViewModel.WeatherState.Error -> {
+        weatherState is WeatherViewModel.WeatherState.Error -> {
             ErrorScreen(message = (weatherState as WeatherViewModel.WeatherState.Error).message)
         }
 
-        WeatherViewModel.WeatherState.Empty -> {}
+        else -> LoadingScreen()
     }
 }
 
@@ -90,72 +100,146 @@ fun ErrorScreen(message: String) {
         Text(text = message, color = Color.Red, fontSize = 18.sp)
     }
 }
-
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun WeatherContent(weather: CurrentWeather) {
-
-
+fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
     val currentDate =
         remember { SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date()) }
     val currentTime = remember { SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date()) }
-
     val weatherIcon =
         "https://openweathermap.org/img/wn/${weather.weather.firstOrNull()?.icon}@2x.png"
+    /*
+        LazyColumn(
 
+          modifier = Modifier
+                .fillMaxHeight()
+                .padding(top = 70.dp, start = 10.dp, end = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        )*/
 
-    Log.i("TAG WeatherContent", "WeatherContent:  ${weatherIcon}")
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 70.dp, start = 10.dp, end = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier.fillMaxHeight()
     ) {
-        item {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                Icon(
-                    imageVector = Icons.Filled.LocationOn,
-                    contentDescription = "LocationIcon",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = weather.name, fontSize = 26.sp, color = Color.White)
-            }
-        }
+        LazyColumn(
+            modifier = Modifier.weight(1f)
+                .fillMaxHeight()
+                .padding(top = 70.dp, start = 10.dp, end = 10.dp),
 
-        item {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        )
+
+        {
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                    Icon(
+                        imageVector = Icons.Filled.LocationOn,
+                        contentDescription = "LocationIcon",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = weather.name, fontSize = 26.sp, color = Color.White)
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(text = weather.sys?.country ?: "", fontSize = 16.sp, color = Color.Gray)
+                }
+            }
+
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "${weather.main.temp.toInt()}°C", fontSize = 50.sp,
+                        fontWeight = FontWeight.Bold, color = Color.White
+                    )
+                    GlideImage(
+                        model = weatherIcon, contentDescription = "Weather icon", modifier = Modifier.size(100.dp)
+                    )
+                    Text(
+                        text = weather.weather.firstOrNull()?.description ?: "", fontSize = 20.sp, color = Color.White ,fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+            item {
+                Row(horizontalArrangement = Arrangement.Center) {
+                    Text(text = currentDate, fontSize = 20.sp, color = Color.White)
+                    Spacer(modifier = Modifier.width(40.dp))
+                    Text(text = currentTime, fontSize = 20.sp, color = Color.White)
+                }
+            }
+
+            item { WeatherDetails(weather) }
+
+            item {
                 Text(
-                    text = "${weather.main.temp.toInt()}°C",
-                    fontSize = 50.sp,
+                    text = "Hourly Forecast",
+                    fontSize = 24.sp,fontWeight = FontWeight.Bold, color = Color.White
+                )
+            }
+
+            item {
+                forecast?.let {
+                    HourlyForecast(it.list.take(8))
+                } ?: run {
+                    Text("Loading forecast...", color = Color.LightGray)
+                }
+            }
+
+            item {
+                Text(
+                    text = "Next 5 Days",
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                GlideImage(
-                    model = weatherIcon,
-                    contentDescription = "Weather icon",
-                    modifier = Modifier.size(100.dp)
-                )
-                Text(
-                    text = weather.weather.firstOrNull()?.description ?: "",
-                    fontSize = 20.sp,
-                    color = Color.LightGray
+                    color = Color.White,
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
-        }
 
-        item {
-            Row(horizontalArrangement = Arrangement.Center) {
-                Text(text = currentDate, fontSize = 16.sp, color = Color.LightGray)
-                Spacer(modifier = Modifier.width(40.dp))
-                Text(text = currentTime, fontSize = 16.sp, color = Color.Gray)
+            items(getDailyForecast(forecast?.list ?: emptyList()), key = { it.fullDate.time }) { daily ->
+                DailyForecastItem(daily)
             }
-        }
 
-        item {
-            WeatherDetails(weather)
+        }
+    }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun HourlyForecast(hourlyData: List<ForecastItem>) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(hourlyData) { item ->
+            HourlyForecastItem(item)
+        }
+    }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun HourlyForecastItem(item: ForecastItem) {
+    val timeFormat = SimpleDateFormat("h a", Locale.getDefault())
+    val time = remember { timeFormat.format(Date(item.dt * 1000L)) }
+
+    Card(
+        modifier = Modifier.fillMaxSize().border(1.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = time, color = Color.White)
+            Spacer(modifier = Modifier.height(4.dp))
+            GlideImage(
+                model = "https://openweathermap.org/img/wn/${item.weather.firstOrNull()?.icon}@2x.png",
+                contentDescription = "Weather icon",
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = "${item.main.temp.toInt()}°C", color = Color.White)
         }
     }
 }
@@ -163,10 +247,7 @@ fun WeatherContent(weather: CurrentWeather) {
 @Composable
 fun WeatherDetails(weather: CurrentWeather) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(14.dp)
-            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        modifier = Modifier.fillMaxWidth().padding(14.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -189,8 +270,113 @@ fun WeatherDetails(weather: CurrentWeather) {
 
 @Composable
 fun WeatherData(key: String, value: String) {
-    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(text = value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Text(text = key, fontWeight = FontWeight.SemiBold, color = Color.LightGray)
+    }
+}
+
+
+data class DailyForecast(
+    val date: String,
+    val fullDate: Date,
+    val tempMin: Int,
+    val tempMax: Int,
+    val icon: String,
+    val description: String
+)
+
+
+fun getDailyForecast(list: List<ForecastItem>): List<DailyForecast> {
+    if (list.isEmpty()) return emptyList()
+
+    val dailyMap = mutableMapOf<String, MutableList<ForecastItem>>()
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
+
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    val todayMidnight = calendar.timeInMillis / 1000
+
+    list.forEach { item ->
+        val itemDate = Date(item.dt * 1000L)
+        val date = dateFormat.format(itemDate)
+
+        if (item.dt >= todayMidnight) {
+            dailyMap.getOrPut(date) { mutableListOf() }.add(item)
+        }
+    }
+    val fixedDays = mutableListOf<DailyForecast>()
+    repeat(5) { _ ->
+        val currentDate = calendar.time
+        val currentDateString = dateFormat.format(currentDate)
+
+        val items = dailyMap[currentDateString] ?: mutableListOf()
+
+        val noonItem = items.firstOrNull {
+            SimpleDateFormat("H", Locale.getDefault()).format(Date(it.dt * 1000L)) == "12"
+        } ?: items.lastOrNull()
+
+        fixedDays.add(
+            DailyForecast(
+                date = dayFormat.format(currentDate),
+                fullDate = currentDate,
+                tempMin = items.minOfOrNull { it.main.temp_min.toInt() }
+                    ?: 10,
+                tempMax = items.maxOfOrNull { it.main.temp_max.toInt() }
+                    ?: 20,
+                icon = noonItem?.weather?.firstOrNull()?.icon ?: "01d",
+                description = noonItem?.weather?.firstOrNull()?.description ?: "No Data"
+            )
+        )
+        calendar.add(Calendar.DAY_OF_MONTH, 1)
+    }
+
+    fixedDays.forEach { forecast ->
+        println("${forecast.date} - ${forecast.fullDate} | Min: ${forecast.tempMin}, Max: ${forecast.tempMax}")
+    }
+    return fixedDays
+}
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun DailyForecastItem(daily: DailyForecast) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp).background(Color.Transparent),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = daily.date, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                color = Color.White, modifier = Modifier.weight(1f)
+            )
+
+            GlideImage(
+                model = "https://openweathermap.org/img/wn/${daily.icon}@2x.png",
+                contentDescription = "Weather icon",
+                modifier = Modifier.size(40.dp).weight(1f)
+            )
+
+            Text(
+                text = daily.description.replaceFirstChar { it.uppercase() }, fontSize = 14.sp,
+                color = Color.White, modifier = Modifier.weight(2f)
+            )
+
+            Text(
+                text = "${daily.tempMin}°/${daily.tempMax}°", fontSize = 14.sp, color = Color.LightGray,
+                textAlign = TextAlign.End, modifier = Modifier.weight(1f)
+            )
+        }
     }
 }

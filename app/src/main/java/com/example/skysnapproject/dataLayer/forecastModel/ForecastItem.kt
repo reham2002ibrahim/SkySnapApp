@@ -1,6 +1,6 @@
 package com.example.skysnapproject.dataLayer.forecastModel
 
-data class Item0(
+data class ForecastItem(
     val clouds: Clouds,
     val dt: Int,
     val dt_txt: String,
