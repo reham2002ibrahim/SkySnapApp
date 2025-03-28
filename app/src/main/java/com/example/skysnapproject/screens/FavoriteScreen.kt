@@ -58,6 +58,7 @@ fun FavoriteScreen() {
             )
         }
     }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {

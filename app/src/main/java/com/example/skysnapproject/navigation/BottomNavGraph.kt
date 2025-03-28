@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 fun BottomNavGraph(navController: NavHostController, paddingValues: PaddingValues) {
     NavHost(
         navController = navController,
-        startDestination = "Splash"
+        startDestination = "Favorites"
     ) {
         composable("Splash") {
             SplashScreen(navController = navController)
