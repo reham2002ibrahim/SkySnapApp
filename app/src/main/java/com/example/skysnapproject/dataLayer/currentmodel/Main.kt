@@ -1,4 +1,4 @@
-package com.example.skysnapproject.dataLayer.model
+package com.example.skysnapproject.dataLayer.currentmodel
 
 data class Main(
     val feels_like: Double,

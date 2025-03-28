@@ -1,6 +1,6 @@
 package com.example.skysnapproject.dataLayer.repo
 
-import com.example.skysnapproject.dataLayer.model.CurrentWeather
+import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import retrofit2.Response
 
 interface RepositoryInterface {

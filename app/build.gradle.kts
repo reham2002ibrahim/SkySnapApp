@@ -81,7 +81,11 @@ dependencies {
     implementation("com.google.code.gson:gson:2.12.1")
 
     // Glide for Image Loading
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+    implementation ("com.google.code.gson:gson:2.12.1")
+    implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
 
     // Lifecycle & Coroutines
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
@@ -119,6 +123,8 @@ dependencies {
         //fullLayout
 
         implementation("com.google.accompanist:accompanist-systemuicontroller:0.33.1-alpha")*/
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
 
 }

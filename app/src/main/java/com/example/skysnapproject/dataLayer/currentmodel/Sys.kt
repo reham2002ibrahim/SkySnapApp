@@ -1,4 +1,4 @@
-package com.example.skysnapproject.dataLayer.model
+package com.example.skysnapproject.dataLayer.currentmodel
 
 data class Sys(
     val country: String,

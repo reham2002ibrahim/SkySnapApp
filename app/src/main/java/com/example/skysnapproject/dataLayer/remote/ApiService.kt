@@ -1,12 +1,13 @@
 package com.example.skysnapproject.dataLayer.remote
 
-import com.example.skysnapproject.dataLayer.model.CurrentWeather
+import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface ApiService {
 
+// API_KEY
+interface ApiService {
 
     @GET("weather")
     suspend fun getCurrentWeather(
