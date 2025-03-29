@@ -9,10 +9,7 @@ import com.example.skysnapproject.locationFeatch.WeatherViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,10 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.local.PlaceDatabase
 import com.example.skysnapproject.dataLayer.local.PlaceLocalDataSource
 import com.example.skysnapproject.dataLayer.remote.RemoteDataSourceImpl
@@ -39,12 +33,10 @@ import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
 import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.locationFeatch.ErrorScreen
 import com.example.skysnapproject.locationFeatch.LoadingScreen
-import com.example.skysnapproject.locationFeatch.LocationManager
 import com.example.skysnapproject.locationFeatch.WeatherContent
 import com.example.skysnapproject.locationFeatch.WeatherViewModelFactory
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.ui.theme.SkySnapProjectTheme
-import kotlinx.coroutines.launch
 
 
 class FavLocationActivity : ComponentActivity() {
@@ -64,7 +56,6 @@ class FavLocationActivity : ComponentActivity() {
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun FavLocationScreen(cityName: String) {
-    val activity = LocalActivity.current
     val context = LocalContext.current
 
 
@@ -75,8 +66,7 @@ fun FavLocationScreen(cityName: String) {
                 localDataSource = PlaceLocalDataSource(
                     dao = PlaceDatabase.getInstance(LocalContext.current).placeDao()
                 )
-            ),
-            locationManager = LocationManager(LocalContext.current)
+            )
         )
     )
 
