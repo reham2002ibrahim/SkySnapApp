@@ -7,8 +7,8 @@ class PlaceLocalDataSource(private val dao: DAO) :LocalDataSource {
 
     override suspend fun getFavPlaces(): Flow<List<Place>> = dao.getFavPlaces()
 
-    override suspend fun insert(place: Place): Long = dao.insert(place)
+    override suspend fun insert(place: Place): Flow<Long> = dao.insert(place)
 
 
-    override suspend fun delete(place: Place): Int = dao.delete(place)
+    override suspend fun delete(place: Place): Flow<Int> = dao.delete(place)
 }

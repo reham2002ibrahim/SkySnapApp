@@ -9,10 +9,12 @@ import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel() {
@@ -29,46 +31,55 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
 
 
     fun fetchLocation(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val locationManager = LocationManager(context)
             locationManager.fetchLocation()
             val city = locationManager.currentCity
             city?.let {
-                getCurrentWeather(it)
-                getForecast(it)
+                withContext(Dispatchers.Main) {
+                    getCurrentWeather(it)
+                    getForecast(it)
+                }
             }
         }
     }
 
     fun getCurrentWeather(city: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _weatherState.value = Response.Loading
             try {
                 repository.getCurrentWeather(city)
                     .collect { weatherData ->
-                        _weatherState.value = Response.Success(weatherData)
+
+                        withContext(Dispatchers.Main) {
+                            _weatherState.value = Response.Success(weatherData)
+                        }
                     }
             } catch (e: Exception) {
-                _weatherState.value = Response.Failure(e)
+                withContext(Dispatchers.Main) {
+                    _weatherState.value = Response.Failure(e)
+                }
             }
         }
     }
 
 
     //  ******* forecast data
-   /* private val _forecastState = MutableStateFlow<ForecastState>(ForecastState.Empty)
-    val forecastState: StateFlow<ForecastState> = _forecastState*/
 
     fun getForecast(city: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _forecastState.value = Response.Loading
             try {
                 repository.getForecast(city)
                     .collect { forecastData ->
-                        _forecastState.value = Response.Success(forecastData)
+                        withContext(Dispatchers.Main) {
+                            _forecastState.value = Response.Success(forecastData)
+                        }
                     }
             } catch (e: Exception) {
-                _forecastState.value = Response.Failure(e)
+                withContext(Dispatchers.Main) {
+                    _forecastState.value = Response.Failure(e)
+                }
             }
         }
     }
@@ -77,7 +88,7 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
     // for saving location
 
     fun saveLocation(place: Place) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val ans = repository.addPlace(place)
             if (ans > 0) Log.i("TAG", "saveLocation: added sussefully  ")
             else Log.i("TAG", "saveLocation: can't  added  ")

@@ -26,11 +26,11 @@ class Repository private constructor(
     }
 
 
-    override suspend fun addPlace(place: Place): Long {
+    override suspend fun addPlace(place: Place): Flow< Long> {
         return localDataSource.insert(place)
     }
 
-    override suspend fun removePlace(place: Place): Int {
+    override suspend fun removePlace(place: Place): Flow< Int >{
         return localDataSource.delete(place)
     }
 

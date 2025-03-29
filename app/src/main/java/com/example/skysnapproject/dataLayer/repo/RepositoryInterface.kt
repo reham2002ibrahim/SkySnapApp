@@ -17,8 +17,8 @@ interface RepositoryInterface {
 
 
     suspend fun getFavPlace(): Flow<List<Place>>
-    suspend fun addPlace(place: Place): Long
-    suspend fun removePlace(place: Place): Int
+    suspend fun addPlace(place: Place):Flow<  Long>
+    suspend fun removePlace(place: Place): Flow< Int>
 
 
 }

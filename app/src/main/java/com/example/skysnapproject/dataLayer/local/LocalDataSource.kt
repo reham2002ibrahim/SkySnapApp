@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface LocalDataSource {
 
     suspend fun getFavPlaces(): Flow<List<Place>>
-    suspend fun insert(Place: Place): Long
-    suspend fun delete(Place: Place): Int
+    suspend fun insert(Place: Place): Flow< Long>
+    suspend fun delete(Place: Place): Flow< Int>
 }

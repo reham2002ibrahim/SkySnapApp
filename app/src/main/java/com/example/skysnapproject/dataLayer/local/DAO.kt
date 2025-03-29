@@ -18,12 +18,12 @@ interface DAO {
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert (place: Place) :Long
+    suspend fun insert (place: Place) : Flow<Long>
 
 
 
     @Delete
-    suspend fun delete (place: Place) :Int
+    suspend fun delete (place: Place) : Flow<Int>
 
 
 /*

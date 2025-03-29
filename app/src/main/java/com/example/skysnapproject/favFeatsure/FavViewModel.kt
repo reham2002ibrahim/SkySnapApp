@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FavViewModel(
     private val repository: RepositoryInterface) : ViewModel() {
@@ -24,15 +25,15 @@ class FavViewModel(
     private val _favPlaces = MutableStateFlow<List<Place>>(emptyList())
     val favPlaces: StateFlow<List<Place>> = _favPlaces.asStateFlow()
 
-    private val mutableMessage: MutableLiveData<String> = MutableLiveData()
-    val message: LiveData<String> = mutableMessage
+    private val _message = MutableStateFlow("")
+    val message: StateFlow<String> = _message.asStateFlow()
 
     init {
         loadFavorites()
     }
 
     private fun loadFavorites() {
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO){
             repository.getFavPlace().collect { places ->
                 _favPlaces.emit(places)
             }
@@ -41,21 +42,23 @@ class FavViewModel(
 
 
     fun deletePlace(place: Place) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = repository.removePlace(place)
-                if (result > 0) {
-                    mutableMessage.postValue("Deleted successfully")
-                    Log.i("DeletePlace", "deletePlace: deleted sussefully ")
+                withContext(Dispatchers.Main) {
+                    if (result > 0) {
+                        _message.emit("Deleted successfully")
+                        Log.i("DeletePlace", "deletePlace: deleted sussefully ")
 
-                } else {
-                    mutableMessage.postValue("not found product")
-                    Log.i("DeletePlace", "deletePlace: cant' delete ")
+                    } else {
+                        _message.emit("not found product")
+                        Log.i("DeletePlace", "deletePlace: cant' delete ")
+                    }
                 }
-
             } catch (ex: Exception) {
-                mutableMessage.postValue("Error: ${ex.message}")
-
+                withContext(Dispatchers.Main) {
+                    _message.emit("Error: ${ex.message}")
+                }
             }
 
         }
