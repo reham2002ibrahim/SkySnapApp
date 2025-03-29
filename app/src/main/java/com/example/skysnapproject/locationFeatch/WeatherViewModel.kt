@@ -1,6 +1,7 @@
 package com.example.skysnapproject.locationFeatch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
@@ -8,9 +9,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel() {
+class WeatherViewModel(private val repository: RepositoryInterface,
+                        private val locationManager: LocationManager) : ViewModel() {
+
+
     private val _weatherState = MutableStateFlow<WeatherState>(WeatherState.Empty)
     val weatherState: StateFlow<WeatherState> = _weatherState
+
+
+    fun fetchLocation() {
+        viewModelScope.launch {
+            locationManager.fetchLocation()
+            val city = locationManager.currentCity
+            city?.let {
+                getCurrentWeather(it)
+                getForecast(it)
+            }
+        }
+    }
+
 
     fun getCurrentWeather(city: String) {
         viewModelScope.launch {
@@ -63,5 +80,13 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
         object Loading : ForecastState()
         data class Success(val forecastData: Forecast) : ForecastState()
         data class Error(val message: String) : ForecastState()
+    }
+
+
+
+    // for saving location
+
+    suspend fun saveLocation(place: Place) {
+        repository.addPlace(place)
     }
 }

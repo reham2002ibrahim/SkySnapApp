@@ -10,6 +10,6 @@ data class Place(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
 
-    var name: String?
+    val name: String?
 
 ): Serializable

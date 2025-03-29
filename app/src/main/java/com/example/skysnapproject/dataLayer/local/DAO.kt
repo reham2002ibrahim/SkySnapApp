@@ -17,7 +17,14 @@ interface DAO {
 
 
     @Query("Select *from place")
-    fun getFav() : Flow<List<Place>>
+    fun getFavPlaces(): Flow<List<Place>> // تغيير نوع الإرجاع إلى Flow
+
+
+/*
+
+    @Query("Select *from place")
+    suspend fun getFav() : List<Place>
+*/
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

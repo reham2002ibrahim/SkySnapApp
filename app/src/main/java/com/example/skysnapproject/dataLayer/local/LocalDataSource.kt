@@ -4,9 +4,9 @@ import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
-    suspend fun getAllPlaces(): List<Place>
-    suspend fun getFavPlaces(): Flow < List<Place> >
-    suspend fun insertAll(Place: List<Place>)
+    //suspend fun getFavPlaces(): List<Place>
+    suspend fun getFavPlaces(): Flow<List<Place>>
+
     suspend fun insert(Place: Place): Long
     suspend fun update(Place: Place)
     suspend fun delete(Place: Place): Int

@@ -25,12 +25,15 @@ class Repository private constructor(
 
     override suspend fun getFavPlace(): Flow<List<Place>> {
         return localDataSource.getFavPlaces()
+
     }
+
+
+
 
     override suspend fun addPlace(place: Place): Long {
         return localDataSource.insert(place)
     }
-
     override suspend fun removePlace(place: Place): Int {
         return localDataSource.delete(place)
     }

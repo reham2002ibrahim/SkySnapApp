@@ -9,7 +9,7 @@ import com.example.skysnapproject.dataLayer.PlaceModels.Place
 
 @Database(entities = arrayOf(Place::class), version = 1 , exportSchema = false)
 abstract class PlaceDatabase : RoomDatabase() {
-    abstract fun getPlaaceDao(): DAO
+    abstract fun placeDao(): DAO
 
     companion object {
         @Volatile

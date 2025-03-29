@@ -39,7 +39,7 @@ android {
 
     buildFeatures {
         compose = true
-        buildConfig = true // ✅ ضروري لتفعيل BuildConfig
+        buildConfig = true
     }
 
     compileOptions {
@@ -61,6 +61,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -113,18 +117,19 @@ dependencies {
 
     //matrial
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
-
-    /*    //loading Network image
-        implementation("io.coil-kt:coil-compose:2.4.0")
-
-        //fonts
-        implementation("com.git.Gurupreet:FontAwesomeCompose:1.0.0")
-
-        //fullLayout
-
-        implementation("com.google.accompanist:accompanist-systemuicontroller:0.33.1-alpha")*/
+    
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+
+
+    //map
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation ("com.google.android.libraries.places:places:2.7.0")
+
+
+    // activity
+    implementation ("androidx.activity:activity-compose:1.8.0")
 
 
 }

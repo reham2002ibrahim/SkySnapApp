@@ -1,17 +1,18 @@
-package com.example.skysnapproject.locationFeatch
+package com.example.skysnapproject.favFeatsure
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
 
-class WeatherViewModelFactory(
-    private val repository: RepositoryInterface,
-    private val locationManager: LocationManager
+class FavViewModelFactory(
+    private val repository: RepositoryInterface
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WeatherViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(FavViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return WeatherViewModel(repository, locationManager) as T
+            return FavViewModel(
+                repository
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

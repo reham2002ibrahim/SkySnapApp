@@ -35,11 +35,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
@@ -49,23 +49,17 @@ import com.example.skysnapproject.screens.GradientBackground
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun HomeScreen(viewModel: WeatherViewModel) {
-    val context = LocalContext.current
-    val locationManager = remember { LocationManager(context) }
+fun HomeScreen(viewModel: WeatherViewModel = viewModel()) {
+
     val weatherState by viewModel.weatherState.collectAsState()
     val forecastState by viewModel.forecastState.collectAsState()
 
     LaunchedEffect(Unit) {
-        locationManager.fetchLocation()
-        locationManager.currentCity?.let { city ->
-            viewModel.getCurrentWeather(city)
-            viewModel.getForecast(city)
-        }
+        viewModel.fetchLocation()
     }
 
     GradientBackground()
@@ -100,6 +94,7 @@ fun ErrorScreen(message: String) {
         Text(text = message, color = Color.Red, fontSize = 18.sp)
     }
 }
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
@@ -122,7 +117,8 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
         modifier = Modifier.fillMaxHeight()
     ) {
         LazyColumn(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
                 .fillMaxHeight()
                 .padding(top = 70.dp, start = 10.dp, end = 10.dp),
 
@@ -153,10 +149,15 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
                         fontWeight = FontWeight.Bold, color = Color.White
                     )
                     GlideImage(
-                        model = weatherIcon, contentDescription = "Weather icon", modifier = Modifier.size(100.dp)
+                        model = weatherIcon,
+                        contentDescription = "Weather icon",
+                        modifier = Modifier.size(100.dp)
                     )
                     Text(
-                        text = weather.weather.firstOrNull()?.description ?: "", fontSize = 20.sp, color = Color.White ,fontWeight = FontWeight.Bold,
+                        text = weather.weather.firstOrNull()?.description ?: "",
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
@@ -174,7 +175,7 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
             item {
                 Text(
                     text = "Hourly Forecast",
-                    fontSize = 24.sp,fontWeight = FontWeight.Bold, color = Color.White
+                    fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White
                 )
             }
 
@@ -196,7 +197,9 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
                 )
             }
 
-            items(getDailyForecast(forecast?.list ?: emptyList()), key = { it.fullDate.time }) { daily ->
+            items(
+                getDailyForecast(forecast?.list ?: emptyList()),
+                key = { it.fullDate.time }) { daily ->
                 DailyForecastItem(daily)
             }
 
@@ -224,7 +227,9 @@ fun HourlyForecastItem(item: ForecastItem) {
     val time = remember { timeFormat.format(Date(item.dt * 1000L)) }
 
     Card(
-        modifier = Modifier.fillMaxSize().border(1.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .fillMaxSize()
+            .border(1.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -247,7 +252,10 @@ fun HourlyForecastItem(item: ForecastItem) {
 @Composable
 fun WeatherDetails(weather: CurrentWeather) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(14.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(14.dp)
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -348,12 +356,18 @@ fun getDailyForecast(list: List<ForecastItem>): List<DailyForecast> {
 @Composable
 fun DailyForecastItem(daily: DailyForecast) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp).background(Color.Transparent),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .background(Color.Transparent),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -365,7 +379,9 @@ fun DailyForecastItem(daily: DailyForecast) {
             GlideImage(
                 model = "https://openweathermap.org/img/wn/${daily.icon}@2x.png",
                 contentDescription = "Weather icon",
-                modifier = Modifier.size(40.dp).weight(1f)
+                modifier = Modifier
+                    .size(40.dp)
+                    .weight(1f)
             )
 
             Text(
@@ -374,8 +390,11 @@ fun DailyForecastItem(daily: DailyForecast) {
             )
 
             Text(
-                text = "${daily.tempMin}°/${daily.tempMax}°", fontSize = 14.sp, color = Color.LightGray,
-                textAlign = TextAlign.End, modifier = Modifier.weight(1f)
+                text = "${daily.tempMin}°/${daily.tempMax}°",
+                fontSize = 14.sp,
+                color = Color.LightGray,
+                textAlign = TextAlign.End,
+                modifier = Modifier.weight(1f)
             )
         }
     }

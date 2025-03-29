@@ -1,5 +1,7 @@
 package com.example.skysnapproject.screens
-
+import android.content.Context
+import android.content.Intent
+import android.location.Geocoder
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,75 +15,127 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.draw.alpha
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.skysnapproject.R
-
+import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
+import com.example.skysnapproject.favFeatsure.FavLocationActivity
+import com.example.skysnapproject.favFeatsure.FavViewModel
+import com.example.skysnapproject.favFeatsure.FavViewModelFactory
+import com.example.skysnapproject.locationFeatch.LocationManager
+import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import com.example.skysnapproject.locationFeatch.WeatherViewModelFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 
 @Composable
-fun FavoriteScreen() {
-    val alpha = animateAlpha()
+fun FavoriteScreen(
+    navController: NavHostController,
+    repository: RepositoryInterface
+) {
+    val viewModel: FavViewModel = viewModel(factory = FavViewModelFactory(repository))
+    val favPlaces by viewModel.favPlaces.collectAsState()
 
     GradientBackground()
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth().padding(top = 70.dp, start = 10.dp, end = 10.dp),
-        contentPadding = PaddingValues(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().padding(top = 70.dp, start = 10.dp, end = 10.dp),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Text(
+                    text = stringResource(id = R.string.fav_header),
+                    fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center, style = TextStyle(brush = GradientText())
+                )
+            }
 
-         item {
-             Text(
-                 text =stringResource(id = R.string.fav_header), fontSize = 24.sp,
-                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-                 style = TextStyle(brush = GradientText()),
-                 modifier = Modifier.alpha(alpha.value),
-                 )
-         }
+            if (favPlaces.isEmpty()) {
+                item {
+                    Text(
+                        text = "No favorite locations added yet", fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium, color = Color.White, textAlign = TextAlign.Center
+                    )
+                }
+            } else {
 
-        items(5) { index ->
-            FavRowItemCard(
-                cityName = "city $index"
-            )
+                items(favPlaces.size) { index ->
+                    val place = favPlaces[index]
+                    place.name?.let { cityName ->
+                        FavRowItemCard(
+                            cityName = cityName,onDelete = {
+                                viewModel.viewModelScope.launch {
+                                    viewModel.deletePlace(place)
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         }
-    }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
         FloatingActionButton(
-            onClick = { /* vm add location */ },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(25.dp),
+            onClick = { navController.navigate("map") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 90.dp, end = 16.dp),
+            containerColor = Color(0xFF6A0572)
         ) {
             Icon(
-                imageVector = Icons.Default.Add, contentDescription = "Add", tint = Color(0xFF6A0572)
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add",
+                tint = Color.White
             )
         }
-
-
     }
-
 }
-
-
-
 @Composable
-fun FavRowItemCard( cityName: String) {
+fun FavRowItemCard(cityName: String, onDelete: () -> Unit,     context: Context = LocalContext.current
+) {
+
+
     Card(
-        modifier = Modifier.fillMaxWidth().padding(4.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .clickable {
+                val intent = Intent(context, FavLocationActivity::class.java).apply {
+                    putExtra("CITY_NAME", cityName)
+                }
+                context.startActivity(intent)
+            }
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -95,12 +149,206 @@ fun FavRowItemCard( cityName: String) {
             )
             Icon(
                 imageVector = Icons.Filled.DeleteForever,
-                tint = Blue,
-                contentDescription = "FavLocation",
-                modifier = Modifier.size(40.dp).clickable {
-                       // VM for delete
-                    }
+                tint = Blue, contentDescription = "Delete",
+                modifier = Modifier.size(40.dp).clickable(onClick = onDelete)
             )
         }
     }
 }
+
+
+
+
+@Composable
+fun MapScreen(repository: RepositoryInterface, locationManager: LocationManager) {
+    val viewModel: WeatherViewModel = viewModel(
+        factory = WeatherViewModelFactory(repository, locationManager)
+    )
+
+    var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(30.0240858, 31.2476), 10f)
+    }
+
+    var showSaveButton by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    Box(modifier = Modifier.fillMaxSize().padding(top = 50.dp)) {
+        Column {
+            TextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                placeholder = { Text("Search for a location") }, singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = {
+                        val geocoder = Geocoder(context)
+                        try {
+                            val addresses = geocoder.getFromLocationName(searchQuery, 1)
+                            if (addresses != null && addresses.isNotEmpty()) {
+                                val location = addresses[0]
+                                val latLng = LatLng(location.latitude, location.longitude)
+                                selectedPosition = latLng
+                                cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 10f)
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
+                    }
+                }
+            )
+
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(zoomControlsEnabled = true),
+                onMapClick = { latLng ->
+                    selectedPosition = latLng
+                    showSaveButton = true
+                }
+            ) {
+                selectedPosition?.let {
+                    Marker(
+                        state = MarkerState(position = it),
+                        title = "Selected Location",
+                        snippet = "Lat: ${it.latitude}, Lng: ${it.longitude}"
+                    )
+                }
+            }
+        }
+
+        if (showSaveButton && selectedPosition != null) {
+            Column(
+                modifier = Modifier.align(Alignment.Center).padding(16.dp)
+            ) {
+                Text(
+                    text = "Lat: ${selectedPosition?.latitude}, Lng: ${selectedPosition?.longitude}",
+                    color = Color.Black,
+                    modifier = Modifier.background(Color.White).padding(8.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                FloatingActionButton(
+                    onClick = {
+                        selectedPosition?.let { latLng ->
+                            val adminArea = getAdminAreaName(context, latLng)
+
+                            val place = Place(
+                                name = adminArea
+                            )
+                            viewModel.viewModelScope.launch {
+                                viewModel.saveLocation(place)
+                            }
+                        }
+                        showSaveButton = false
+                    },
+                    containerColor = Color(0xFF88698A)
+                ) {
+                    Text(text = "Save", color = Color.White)
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopEnd).padding(end = 14.dp, top = 70.dp)
+        ) {
+            FloatingActionButton(
+                onClick = {
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                        cameraPositionState.position.target,
+                        cameraPositionState.position.zoom + 1) }, containerColor = Color(0xFF88698A)) {
+                Text(text = "+", color = Color.White, fontSize = 20.sp) }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            FloatingActionButton(
+                onClick = {
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(cameraPositionState.position.target,
+                        cameraPositionState.position.zoom - 1) }, containerColor = Color(0xFF88698A)) {
+                Text(text = "-", color = Color.White, fontSize = 18.sp) }
+        }
+    }
+}
+private fun getAdminAreaName(context: Context, latLng: LatLng): String {
+    return try {
+        val geocoder = Geocoder(context)
+        val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+        addresses?.firstOrNull()?.adminArea ?: "Unknown"
+    } catch (e: Exception) {
+        "Unknown"
+    }
+}
+
+
+
+// running
+/*@Composable
+fun FavoriteScreen(
+    navController: NavHostController,
+    repository: RepositoryInterface
+) {
+    val viewModel: FavViewModel = viewModel(factory = FavViewModelFactory(repository))
+    val favPlaces by viewModel.favPlaces.collectAsState()
+    val alpha = animateAlpha()
+
+    GradientBackground()
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().padding(top = 70.dp, start = 10.dp, end = 10.dp),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Text(
+                    text = stringResource(id = R.string.fav_header),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(brush = GradientText()),
+                    modifier = Modifier.alpha(alpha.value),
+                )
+            }
+
+            if (favPlaces.isEmpty()) {
+                item {
+                    Text(
+                        text = "No favorite locations added yet",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+
+                    items(favPlaces.size) { index ->
+                        val place = favPlaces[index]
+                        place.name?.let { cityName ->
+                            FavRowItemCard(
+                                cityName = cityName,
+
+                                )
+                        }
+                    }
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { navController.navigate("map") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 90.dp, end = 16.dp),
+            containerColor = Color(0xFF6A0572)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add",
+                tint = Color.White
+            )
+        }
+    }
+}*/
+

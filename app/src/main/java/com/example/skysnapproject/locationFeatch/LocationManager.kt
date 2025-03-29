@@ -40,7 +40,7 @@ class LocationManager(private val context: Context) {
 
 
 
-    private fun getCityName(location: Location): String {
+   private  fun getCityName(location: Location): String {
         return try {
             val geocoder = Geocoder(context)
             val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
