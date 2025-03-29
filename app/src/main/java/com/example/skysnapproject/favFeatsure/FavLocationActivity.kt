@@ -34,7 +34,6 @@ import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.locationFeatch.ErrorScreen
 import com.example.skysnapproject.locationFeatch.LoadingScreen
 import com.example.skysnapproject.locationFeatch.WeatherContent
-import com.example.skysnapproject.locationFeatch.WeatherViewModelFactory
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.ui.theme.SkySnapProjectTheme
 
@@ -60,7 +59,7 @@ fun FavLocationScreen(cityName: String) {
 
 
     val viewModel: WeatherViewModel = viewModel(
-        factory = WeatherViewModelFactory(
+        factory = WeatherViewModel.WeatherViewModelFactory(
             repository = Repository.getInstance(
                 remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
                 localDataSource = PlaceLocalDataSource(
