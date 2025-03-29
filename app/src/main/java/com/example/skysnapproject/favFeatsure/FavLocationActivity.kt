@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.local.PlaceDatabase
 import com.example.skysnapproject.dataLayer.local.PlaceLocalDataSource
 import com.example.skysnapproject.dataLayer.remote.RemoteDataSourceImpl
@@ -34,6 +35,7 @@ import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.locationFeatch.ErrorScreen
 import com.example.skysnapproject.locationFeatch.LoadingScreen
 import com.example.skysnapproject.locationFeatch.WeatherContent
+import com.example.skysnapproject.locationFeatch.WeatherViewModel.Response
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.ui.theme.SkySnapProjectTheme
 
@@ -89,11 +91,12 @@ fun FavLocationScreen(cityName: String) {
         return null
     }
 
-    when {
-        weatherState is WeatherViewModel.WeatherState.Loading -> LoadingScreen()
-        weatherState is WeatherViewModel.WeatherState.Success -> {
-            val weather = (weatherState as WeatherViewModel.WeatherState.Success).weatherData
-            val forecast = (forecastState as? WeatherViewModel.ForecastState.Success)?.forecastData
+    when (weatherState) {
+        is Response.Loading -> LoadingScreen()
+
+        is Response.Success -> {
+            val weather = (weatherState as Response.Success<CurrentWeather>).data
+            val forecast = (forecastState as? Response.Success)?.data
 
             Column(modifier = Modifier.fillMaxSize()) {
                 IconButton(
@@ -115,9 +118,12 @@ fun FavLocationScreen(cityName: String) {
                 WeatherContent(weather, forecast)
             }
         }
-        weatherState is WeatherViewModel.WeatherState.Error -> {
-            ErrorScreen(message = (weatherState as WeatherViewModel.WeatherState.Error).message)
+
+        is Response.Failure -> {
+            ErrorScreen(message = (weatherState as Response.Failure).error.message ?: "Unknown Error")
         }
+
         else -> LoadingScreen()
     }
+
 }

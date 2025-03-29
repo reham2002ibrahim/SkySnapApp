@@ -68,21 +68,22 @@ fun HomeScreen(viewModel: WeatherViewModel) {
 
     GradientBackground()
 
-    when {
-        weatherState is WeatherViewModel.WeatherState.Loading -> LoadingScreen()
-        weatherState is WeatherViewModel.WeatherState.Success -> {
-            val weather = (weatherState as WeatherViewModel.WeatherState.Success).weatherData
-            val forecast = (forecastState as? WeatherViewModel.ForecastState.Success)?.forecastData
+    when (val state = weatherState) {
+        is WeatherViewModel.Response.Loading -> LoadingScreen()
+        is WeatherViewModel.Response.Success -> {
+            val weather = state.data as? CurrentWeather
+            val forecast = (forecastState as? WeatherViewModel.Response.Success)?.data as? Forecast
 
-            WeatherContent(weather, forecast)
+            if (weather != null) {
+                WeatherContent(weather, forecast)
+            }
         }
-
-        weatherState is WeatherViewModel.WeatherState.Error -> {
-            ErrorScreen(message = (weatherState as WeatherViewModel.WeatherState.Error).message)
+        is WeatherViewModel.Response.Failure -> {
+            ErrorScreen(message = state.error.message ?: "Unknown error")
         }
-
         else -> LoadingScreen()
     }
+
 }
 
 @Composable

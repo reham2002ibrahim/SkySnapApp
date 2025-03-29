@@ -11,14 +11,21 @@ import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
 class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel() {
 
 
-    private val _weatherState = MutableStateFlow<WeatherState>(WeatherState.Empty)
-    val weatherState: StateFlow<WeatherState> = _weatherState
+    private val _weatherState = MutableStateFlow<Response<CurrentWeather>>(Response.Loading)
+    val weatherState: StateFlow<Response<CurrentWeather>> = _weatherState.asStateFlow()
+
+    private val _forecastState = MutableStateFlow<Response<Forecast>>(Response.Loading)
+    val forecastState: StateFlow<Response<Forecast>> = _forecastState.asStateFlow()
+
+    private val _message = MutableStateFlow("")
+    val message: StateFlow<String> = _message.asStateFlow()
 
 
     fun fetchLocation(context: Context) {
@@ -35,51 +42,35 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
 
     fun getCurrentWeather(city: String) {
         viewModelScope.launch {
-            _weatherState.value = WeatherState.Loading
+            _weatherState.value = Response.Loading
             try {
                 repository.getCurrentWeather(city)
                     .collect { weatherData ->
-                        _weatherState.value = WeatherState.Success(weatherData)
+                        _weatherState.value = Response.Success(weatherData)
                     }
             } catch (e: Exception) {
-                _weatherState.value = WeatherState.Error(e.message ?: "Cached error")
+                _weatherState.value = Response.Failure(e)
             }
         }
     }
 
 
-
-
-    sealed class WeatherState {
-        object Empty : WeatherState()
-        object Loading : WeatherState()
-        data class Success(val weatherData: CurrentWeather) : WeatherState()
-        data class Error(val message: String) : WeatherState()
-    }
-
     //  ******* forecast data
-    private val _forecastState = MutableStateFlow<ForecastState>(ForecastState.Empty)
-    val forecastState: StateFlow<ForecastState> = _forecastState
+   /* private val _forecastState = MutableStateFlow<ForecastState>(ForecastState.Empty)
+    val forecastState: StateFlow<ForecastState> = _forecastState*/
 
     fun getForecast(city: String) {
         viewModelScope.launch {
-            _forecastState.value = ForecastState.Loading
+            _forecastState.value = Response.Loading
             try {
                 repository.getForecast(city)
                     .collect { forecastData ->
-                        _forecastState.value = ForecastState.Success(forecastData)
+                        _forecastState.value = Response.Success(forecastData)
                     }
             } catch (e: Exception) {
-                _forecastState.value = ForecastState.Error(e.message ?: "Cached error")
+                _forecastState.value = Response.Failure(e)
             }
         }
-    }
-
-    sealed class ForecastState {
-        object Empty : ForecastState()
-        object Loading : ForecastState()
-        data class Success(val forecastData: Forecast) : ForecastState()
-        data class Error(val message: String) : ForecastState()
     }
 
 
@@ -92,6 +83,15 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
             else Log.i("TAG", "saveLocation: can't  added  ")
         }
     }
+
+
+
+    sealed class Response<out T> {
+        object Loading : Response<Nothing>()
+        data class Success<T>(val data: T) : Response<T>()
+        data class Failure(val error: Throwable) : Response<Nothing>()
+    }
+
 
 
     class WeatherViewModelFactory(
