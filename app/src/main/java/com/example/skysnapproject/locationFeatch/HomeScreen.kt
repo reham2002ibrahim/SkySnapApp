@@ -35,10 +35,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -53,13 +55,15 @@ import java.util.Locale
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun HomeScreen(viewModel: WeatherViewModel = viewModel()) {
+fun HomeScreen(viewModel: WeatherViewModel) {
+    val context = LocalContext.current
 
-    val weatherState by viewModel.weatherState.collectAsState()
-    val forecastState by viewModel.forecastState.collectAsState()
+
+    val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
+    val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchLocation()
+        viewModel.fetchLocation(context)
     }
 
     GradientBackground()

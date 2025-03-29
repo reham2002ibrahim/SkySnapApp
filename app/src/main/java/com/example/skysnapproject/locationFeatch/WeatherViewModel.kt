@@ -1,5 +1,9 @@
 package com.example.skysnapproject.locationFeatch
+
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
@@ -9,16 +13,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class WeatherViewModel(private val repository: RepositoryInterface,
-                        private val locationManager: LocationManager) : ViewModel() {
+
+class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel() {
 
 
     private val _weatherState = MutableStateFlow<WeatherState>(WeatherState.Empty)
     val weatherState: StateFlow<WeatherState> = _weatherState
 
 
-    fun fetchLocation() {
+    fun fetchLocation(context: Context) {
         viewModelScope.launch {
+            val locationManager = LocationManager(context)
             locationManager.fetchLocation()
             val city = locationManager.currentCity
             city?.let {
@@ -28,22 +33,22 @@ class WeatherViewModel(private val repository: RepositoryInterface,
         }
     }
 
-
     fun getCurrentWeather(city: String) {
         viewModelScope.launch {
             _weatherState.value = WeatherState.Loading
             try {
-                val response = repository.getCurrentWeather(city)
-                if (response.isSuccessful && response.body() != null) {
-                    _weatherState.value = WeatherState.Success(response.body()!!)
-                } else {
-                    _weatherState.value = WeatherState.Error("Failed to get weather data")
-                }
+                repository.getCurrentWeather(city)
+                    .collect { weatherData ->
+                        _weatherState.value = WeatherState.Success(weatherData)
+                    }
             } catch (e: Exception) {
-                _weatherState.value = WeatherState.Error(e.message ?: "chached error")
+                _weatherState.value = WeatherState.Error(e.message ?: "Cached error")
             }
         }
     }
+
+
+
 
     sealed class WeatherState {
         object Empty : WeatherState()
@@ -52,10 +57,7 @@ class WeatherViewModel(private val repository: RepositoryInterface,
         data class Error(val message: String) : WeatherState()
     }
 
-
-
-
-   //  ******* forecast data
+    //  ******* forecast data
     private val _forecastState = MutableStateFlow<ForecastState>(ForecastState.Empty)
     val forecastState: StateFlow<ForecastState> = _forecastState
 
@@ -63,14 +65,12 @@ class WeatherViewModel(private val repository: RepositoryInterface,
         viewModelScope.launch {
             _forecastState.value = ForecastState.Loading
             try {
-                val response = repository.getForecast(city)
-                if (response.isSuccessful && response.body() != null) {
-                    _forecastState.value = ForecastState.Success(response.body()!!)
-                } else {
-                    _forecastState.value = ForecastState.Error("Failed to get forecast")
-                }
+                repository.getForecast(city)
+                    .collect { forecastData ->
+                        _forecastState.value = ForecastState.Success(forecastData)
+                    }
             } catch (e: Exception) {
-                _forecastState.value = ForecastState.Error(e.message ?: "chached error")
+                _forecastState.value = ForecastState.Error(e.message ?: "Cached error")
             }
         }
     }
@@ -83,10 +83,16 @@ class WeatherViewModel(private val repository: RepositoryInterface,
     }
 
 
-
     // for saving location
 
-    suspend fun saveLocation(place: Place) {
-        repository.addPlace(place)
+    fun saveLocation(place: Place) {
+        viewModelScope.launch {
+            val ans = repository.addPlace(place)
+            if (ans > 0) Log.i("TAG", "saveLocation: added sussefully  ")
+            else Log.i("TAG", "saveLocation: can't  added  ")
+        }
     }
+
+
+
 }

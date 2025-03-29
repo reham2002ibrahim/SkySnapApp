@@ -12,34 +12,37 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DAO {
 
-    @Query("Select *from place")
-    suspend fun gatAll() : List<Place>
-
 
     @Query("Select *from place")
-    fun getFavPlaces(): Flow<List<Place>> // تغيير نوع الإرجاع إلى Flow
+    fun getFavPlaces(): Flow<List<Place>>
+
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert (place: Place) :Long
+
+
+
+    @Delete
+    suspend fun delete (place: Place) :Int
 
 
 /*
+/*
+    @Query("Select *from place")
+    suspend fun gatAll() : List<Place>
+*/
 
     @Query("Select *from place")
     suspend fun getFav() : List<Place>
 */
 
 
+/*
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(places : List<Place>)
+*/
 
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert (place: Place) :Long
-
-    @Update
-    suspend fun update (place: Place)
-
-    @Delete
-    suspend fun delete (place: Place) :Int
-
-
+    /*    @Update
+        suspend fun update (place: Place)*/
 
 }

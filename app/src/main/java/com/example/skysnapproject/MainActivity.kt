@@ -1,5 +1,6 @@
 package com.example.skysnapproject
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,12 +26,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val showBottomBar = currentDestination?.route != "Splash"
+    val showBottomBar =( currentDestination?.route != "Splash"
+            && currentDestination?.route != "map" )
+
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
@@ -38,7 +42,7 @@ fun AppScreen() {
             }
         },
         modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
-        BottomNavGraph(navController, paddingValues)
+    ) {
+        BottomNavGraph(navController)
     }
 }

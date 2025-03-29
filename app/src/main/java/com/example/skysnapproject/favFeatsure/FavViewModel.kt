@@ -1,8 +1,8 @@
-
-
 package com.example.skysnapproject.favFeatsure
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.skysnapproject.dataLayer.PlaceModels.Place
@@ -18,32 +18,45 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FavViewModel(
-    private val repository: RepositoryInterface
-) : ViewModel() {
+    private val repository: RepositoryInterface) : ViewModel() {
+
     private val _favPlaces = MutableStateFlow<List<Place>>(emptyList())
     val favPlaces: StateFlow<List<Place>> = _favPlaces.asStateFlow()
+
+    private val mutableMessage: MutableLiveData<String> = MutableLiveData()
+    val message: LiveData<String> = mutableMessage
 
     init {
         loadFavorites()
     }
 
     private fun loadFavorites() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.getFavPlace().collect { places ->
                 _favPlaces.emit(places)
             }
         }
     }
 
-    fun addPlace(place: Place) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.addPlace(place)
-        }
-    }
 
     fun deletePlace(place: Place) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.removePlace(place)
+        viewModelScope.launch {
+            try {
+                val result = repository.removePlace(place)
+                if (result > 0) {
+                    mutableMessage.postValue("Deleted successfully")
+                    Log.i("DeletePlace", "deletePlace: deleted sussefully ")
+
+                } else {
+                    mutableMessage.postValue("not found product")
+                    Log.i("DeletePlace", "deletePlace: cant' delete ")
+                }
+
+            } catch (ex: Exception) {
+                mutableMessage.postValue("Error: ${ex.message}")
+
+            }
+
         }
     }
 }

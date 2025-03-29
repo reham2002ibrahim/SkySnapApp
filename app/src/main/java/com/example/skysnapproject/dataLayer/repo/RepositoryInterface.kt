@@ -8,9 +8,11 @@ import retrofit2.Response
 
 interface RepositoryInterface {
 
-    suspend fun getCurrentWeather(city: String): Response<CurrentWeather>
+//    suspend fun getCurrentWeather(city: String): Response<CurrentWeather>
+    suspend fun getCurrentWeather(city: String): Flow<CurrentWeather>
 
-    suspend fun getForecast(city: String): Response<Forecast>
+    suspend fun getForecast(city: String): Flow<Forecast>
+
 
 
 
