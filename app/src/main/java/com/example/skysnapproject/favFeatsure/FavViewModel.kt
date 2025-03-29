@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
@@ -59,5 +60,20 @@ class FavViewModel(
 
         }
     }
+
+    class FavViewModelFactory(
+        private val repository: RepositoryInterface) : ViewModelProvider.Factory {
+
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(FavViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return FavViewModel(
+                    repository
+                ) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
 }
 

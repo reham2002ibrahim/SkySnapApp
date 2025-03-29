@@ -12,13 +12,11 @@ import com.example.skysnapproject.dataLayer.remote.RemoteDataSourceImpl
 import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
 import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.favFeatsure.FavViewModel
-import com.example.skysnapproject.favFeatsure.FavViewModelFactory
 import com.example.skysnapproject.screens.AlarmScreen
 import com.example.skysnapproject.screens.FavoriteScreen
 import com.example.skysnapproject.locationFeatch.HomeScreen
 import com.example.skysnapproject.locationFeatch.LocationManager
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
-import com.example.skysnapproject.locationFeatch.WeatherViewModelFactory
 import com.example.skysnapproject.screens.MapScreen
 import com.example.skysnapproject.screens.SettingsScreen
 import com.example.skysnapproject.screens.SplashScreen
@@ -38,7 +36,7 @@ fun BottomNavGraph(navController: NavHostController) {
         composable(BottomBarRoutes.HomeRoute.title) {
             val context = LocalContext.current
             val viewModel: WeatherViewModel = viewModel(
-                factory = WeatherViewModelFactory(
+                factory = WeatherViewModel.WeatherViewModelFactory(
                     Repository.getInstance(
                         remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
                         localDataSource = PlaceLocalDataSource(
@@ -54,7 +52,7 @@ fun BottomNavGraph(navController: NavHostController) {
         composable("map") {
             val context = LocalContext.current
             val viewModel: WeatherViewModel = viewModel(
-                factory = WeatherViewModelFactory(
+                factory = WeatherViewModel.WeatherViewModelFactory(
                     Repository.getInstance(
                         remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
                         localDataSource = PlaceLocalDataSource(
@@ -70,7 +68,7 @@ fun BottomNavGraph(navController: NavHostController) {
         composable(BottomBarRoutes.FavRoute.title) {
             val context = LocalContext.current
             val viewModel: FavViewModel = viewModel(
-                factory = FavViewModelFactory(
+                factory = FavViewModel.FavViewModelFactory(
                     Repository.getInstance(
                         remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
                         localDataSource = PlaceLocalDataSource(
