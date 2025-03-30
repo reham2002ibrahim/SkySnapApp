@@ -44,10 +44,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.forecastModel.ForecastItem
 import com.example.skysnapproject.screens.GradientBackground
+import com.example.skysnapproject.screens.LoaderAnimation
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -89,7 +91,10 @@ fun HomeScreen(viewModel: WeatherViewModel) {
 @Composable
 fun LoadingScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(color = Color.White)
+        LoaderAnimation(
+            modifier = Modifier.fillMaxSize(),
+            anmi = R.raw.loading
+        )
     }
 }
 

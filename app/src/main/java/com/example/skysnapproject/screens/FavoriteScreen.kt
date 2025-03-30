@@ -47,7 +47,6 @@ fun FavoriteScreen(
     val favPlaces by viewModel.favPlaces.collectAsStateWithLifecycle()
 
     GradientBackground()
-    var flag = 1
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
@@ -65,7 +64,6 @@ fun FavoriteScreen(
                 )
             }
             if (favPlaces.isEmpty()) {
-                flag = 0
                 item {
                     Box(
                         modifier = Modifier.size(400.dp).padding(top = 200.dp)
@@ -95,7 +93,7 @@ fun FavoriteScreen(
             }
 
         }
-        if (flag == 1){
+        if (favPlaces.isNotEmpty()) {
             FloatingActionButton(
                 onClick = { navController.navigate("map") },
                 modifier = Modifier
