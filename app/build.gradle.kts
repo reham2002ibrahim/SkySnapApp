@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -132,4 +133,52 @@ dependencies {
     implementation ("androidx.activity:activity-compose:1.8.0")
 
 
+
+    //Testing
+    testImplementation ("junit:junit:4.13.2")
+    androidTestImplementation ("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.6.1")
+
+    //MockK
+    testImplementation ("io.mockk:mockk-android:1.13.17")
+    testImplementation ("io.mockk:mockk-agent:1.13.17")
+
+    //kotlinx-coroutines
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+
+
+    // InstantTaskExecutorRule
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    androidTestImplementation ("androidx.arch.core:core-testing:2.1.0")
+
+    // AndroidX and Robolectric
+    testImplementation ("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation ("androidx.test:core-ktx:1.5.0")
+    testImplementation ("org.robolectric:robolectric:4.11")
+
+    // hamcrest
+    testImplementation ("org.hamcrest:hamcrest:2.2")
+    testImplementation ("org.hamcrest:hamcrest-library:2.2")
+    androidTestImplementation ("org.hamcrest:hamcrest:2.2")
+    androidTestImplementation ("org.hamcrest:hamcrest-library:2.2")
+
+    // AndroidX Test - Instrumented testing
+    androidTestImplementation ("androidx.test:core:1.6.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.6.1")
+
+    // AndroidX Test - JVM testing
+    testImplementation ("androidx.test:core-ktx:1.6.1")
+
+    // Dependencies for local unit tests
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.hamcrest:hamcrest:2.2")
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+    testImplementation ("org.robolectric:robolectric:4.12")
+
 }
+
+
+
