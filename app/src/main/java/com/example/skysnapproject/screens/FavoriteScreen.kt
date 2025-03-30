@@ -1,4 +1,5 @@
 package com.example.skysnapproject.screens
+
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.*
@@ -40,15 +41,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FavoriteScreen(
-    navController: NavHostController, viewModel: FavViewModel) {
+    navController: NavHostController, viewModel: FavViewModel
+) {
 
     val favPlaces by viewModel.favPlaces.collectAsStateWithLifecycle()
 
     GradientBackground()
-
+    var flag = 1
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(top = 70.dp, start = 10.dp, end = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 70.dp, start = 10.dp, end = 10.dp),
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -60,13 +64,19 @@ fun FavoriteScreen(
                     textAlign = TextAlign.Center, style = TextStyle(brush = GradientText())
                 )
             }
-
             if (favPlaces.isEmpty()) {
+                flag = 0
                 item {
-                    Text(
-                        text = "No favorite locations added yet", fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium, color = Color.White, textAlign = TextAlign.Center
-                    )
+                    Box(
+                        modifier = Modifier.size(400.dp).padding(top = 200.dp)
+                            .clickable { navController.navigate("map") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoaderAnimation(
+                            modifier = Modifier.fillMaxSize(),
+                            anmi = R.raw.addfav
+                        )
+                    }
                 }
             } else {
 
@@ -74,7 +84,7 @@ fun FavoriteScreen(
                     val place = favPlaces[index]
                     place.name?.let { cityName ->
                         FavRowItemCard(
-                            place,onDelete = {
+                            place, onDelete = {
                                 viewModel.viewModelScope.launch {
                                     viewModel.deletePlace(place)
                                 }
@@ -83,27 +93,32 @@ fun FavoriteScreen(
                     }
                 }
             }
-        }
 
-        FloatingActionButton(
-            onClick = { navController.navigate("map") },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 90.dp, end = 16.dp),
-            containerColor = Color(0xFF6A0572)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-                tint = Color.White
-            )
+        }
+        if (flag == 1){
+            FloatingActionButton(
+                onClick = { navController.navigate("map") },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 90.dp, end = 16.dp),
+                containerColor = Color(0xFF6A0572)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add",
+                    tint = Color.White
+                )
+            }
         }
     }
 }
+
 @Composable
 fun FavRowItemCard(place: Place, onDelete: () -> Unit, context: Context = LocalContext.current) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
             .clickable {
                 val intent = Intent(context, FavLocationActivity::class.java).apply {
                     putExtra("PLACE", place)
@@ -116,22 +131,31 @@ fun FavRowItemCard(place: Place, onDelete: () -> Unit, context: Context = LocalC
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth().padding(12.dp)
-                .background(Color.Transparent).padding(horizontal = 14.dp, vertical = 4.dp),
+                .fillMaxWidth()
+                .padding(12.dp)
+                .background(Color.Transparent)
+                .padding(horizontal = 14.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
             place.name?.let {
                 Text(
-                    text = it, fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier
-                        .weight(1f).padding(start = 8.dp)
+                    text = it,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
                 )
             }
             Icon(
                 imageVector = Icons.Filled.DeleteForever,
                 tint = Blue, contentDescription = "Delete",
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier
+                    .size(40.dp)
                     .clickable(onClick = onDelete)
             )
         }
