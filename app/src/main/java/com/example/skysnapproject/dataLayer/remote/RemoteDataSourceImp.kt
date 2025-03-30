@@ -1,5 +1,6 @@
 package com.example.skysnapproject.dataLayer.remote
 
+import android.location.Location
 import com.example.skysnapproject.BuildConfig.API_KEY
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
@@ -9,9 +10,9 @@ import retrofit2.Response
 
 class RemoteDataSourceImpl(private val apiService: ApiService) : RemoteDataSource {
 
-    override suspend fun getCurrentWeather(city: String): Flow<CurrentWeather> {
+    override suspend fun getCurrentWeather(location: Location): Flow<CurrentWeather> {
         return flow {
-            val response = apiService.getCurrentWeather(city, "metric", API_KEY)
+            val response = apiService.getCurrentWeather(location.latitude, location.longitude, "metric", API_KEY)
             if (response.isSuccessful && response.body() != null) {
                 emit(response.body()!!)
             } else {
@@ -20,9 +21,9 @@ class RemoteDataSourceImpl(private val apiService: ApiService) : RemoteDataSourc
         }
     }
 
-    override suspend fun getForecast(city: String): Flow<Forecast> {
+    override suspend fun getForecast(location: Location): Flow<Forecast> {
         return flow {
-            val response = apiService.getForecast(city, "metric", API_KEY)
+            val response = apiService.getForecast(location.latitude, location.longitude,"metric", API_KEY)
             if (response.isSuccessful && response.body() != null) {
                 emit(response.body()!!)
             } else {

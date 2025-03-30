@@ -1,6 +1,7 @@
 package com.example.skysnapproject.locationFeatch
 
 import android.content.Context
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -30,25 +31,36 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
     val message: StateFlow<String> = _message.asStateFlow()
 
 
+    /*  fun fetchLocation(context: Context) {
+          viewModelScope.launch(Dispatchers.IO) {
+              val locationManager = LocationManager(context)
+             locationManager.fetchLocation()
+              val city = locationManager.currentCity
+              city?.let {
+                  withContext(Dispatchers.Main) {
+                      getCurrentWeather(it)
+                      getForecast(it)
+                  }
+              }
+          }
+      }*/
     fun fetchLocation(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val locationManager = LocationManager(context)
-            locationManager.fetchLocation()
-            val city = locationManager.currentCity
-            city?.let {
-                withContext(Dispatchers.Main) {
-                    getCurrentWeather(it)
-                    getForecast(it)
-                }
+            val location = locationManager.fetchLocation()
+            withContext(Dispatchers.Main) {
+                location?.let { getCurrentWeather(it) }
+                location?.let { getForecast(it) }
             }
         }
     }
 
-    fun getCurrentWeather(city: String) {
+
+    fun getCurrentWeather(location: Location) {
         viewModelScope.launch(Dispatchers.IO) {
             _weatherState.value = Response.Loading
             try {
-                repository.getCurrentWeather(city)
+                repository.getCurrentWeather(location)
                     .collect { weatherData ->
 
                         withContext(Dispatchers.Main) {
@@ -66,11 +78,11 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
 
     //  ******* forecast data
 
-    fun getForecast(city: String) {
+    fun getForecast(location: Location) {
         viewModelScope.launch(Dispatchers.IO) {
             _forecastState.value = Response.Loading
             try {
-                repository.getForecast(city)
+                repository.getForecast(location)
                     .collect { forecastData ->
                         withContext(Dispatchers.Main) {
                             _forecastState.value = Response.Success(forecastData)
@@ -96,13 +108,11 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
     }
 
 
-
     sealed class Response<out T> {
         object Loading : Response<Nothing>()
         data class Success<T>(val data: T) : Response<T>()
         data class Failure(val error: Throwable) : Response<Nothing>()
     }
-
 
 
     class WeatherViewModelFactory(
@@ -116,8 +126,6 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-
-
 
 
 }

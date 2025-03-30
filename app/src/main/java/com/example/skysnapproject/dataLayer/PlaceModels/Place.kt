@@ -9,7 +9,8 @@ import java.io.Serializable
 data class Place(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-
+    var lat:Double = 0.0,
+    var lng:Double = 0.0,
     val name: String?
 
 ): Serializable

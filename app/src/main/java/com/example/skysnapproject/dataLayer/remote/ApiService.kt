@@ -11,21 +11,36 @@ import retrofit2.http.Query
 // API_KEY
 interface ApiService {
 
+
     @GET("weather")
     suspend fun getCurrentWeather(
-        @Query ("q") city : String ,
-        @Query ("units") units : String = "metric" ,
-        @Query ("appid") apiKey : String
-    ) :Response<CurrentWeather>
+        @Query("lat") lat: Double =  0.0 ,
+        @Query("lon") lng: Double =  0.0 ,
+        @Query("units") units: String = "metric",
+        @Query("appid") apiKey: String
+    ): Response<CurrentWeather>
 
 
     @GET("forecast")
     suspend fun getForecast(
-        @Query ("q") city : String ,
-        @Query ("units") units : String = "metric" ,
-        @Query ("appid") apiKey : String
-    ) :Response<Forecast>
+        @Query("lat") lat: Double =  0.0 ,
+        @Query("lon") lng: Double =  0.0 ,
+        @Query("units") units: String = "metric",
+        @Query("appid") apiKey: String
+    ): Response<Forecast>
 
+    /*    @GET("weather")
+        suspend fun getCurrentWeather(
+            @Query ("q") city : String ,
+            @Query ("units") units : String = "metric" ,
+            @Query ("appid") apiKey : String
+        ) :Response<CurrentWeather>*/
+    /*    @GET("forecast")
+        suspend fun getForecast(
+            @Query("q") city: String,
+            @Query("units") units: String = "metric",
+            @Query("appid") apiKey: String
+        ): Response<Forecast>*/
 
 
 

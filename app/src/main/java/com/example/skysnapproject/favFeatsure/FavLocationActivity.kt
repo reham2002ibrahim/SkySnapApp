@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.location.Location
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
 
 import android.os.Bundle
@@ -25,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.local.PlaceDatabase
 import com.example.skysnapproject.dataLayer.local.PlaceLocalDataSource
@@ -34,29 +37,43 @@ import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
 import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.locationFeatch.ErrorScreen
 import com.example.skysnapproject.locationFeatch.LoadingScreen
+import com.example.skysnapproject.locationFeatch.MyLating
 import com.example.skysnapproject.locationFeatch.WeatherContent
 import com.example.skysnapproject.locationFeatch.WeatherViewModel.Response
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.ui.theme.SkySnapProjectTheme
 
 
-class FavLocationActivity : ComponentActivity() {
+/*class FavLocationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val cityName = intent.getStringExtra("CITY_NAME") ?: ""
+        val place = intent.getParcelableExtra<Place>("PLACE")
 
         setContent {
             SkySnapProjectTheme {
-                FavLocationScreen(cityName = cityName)
+                FavLocationScreen(place)
+            }
+        }
+    }
+}*/
+class FavLocationActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val place = intent.getSerializableExtra("PLACE") as? Place
+        setContent {
+            SkySnapProjectTheme {
+                place?.let { FavLocationScreen(it) }
             }
         }
     }
 }
 
 
+
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun FavLocationScreen(cityName: String) {
+fun FavLocationScreen(place: Place) {
     val context = LocalContext.current
 
 
@@ -71,15 +88,19 @@ fun FavLocationScreen(cityName: String) {
         )
     )
 
-    LaunchedEffect(cityName) {
-        if (cityName.isNotEmpty()) {
-            viewModel.getCurrentWeather(cityName)
-            viewModel.getForecast(cityName)
+    LaunchedEffect(place) {
+        place?.let {
+            val location = Location("").apply {
+                latitude = it.lat
+                longitude = it.lng
+            }
+            viewModel.getCurrentWeather(location)
+            viewModel.getForecast(location)
         }
     }
 
-    val weatherState by viewModel.weatherState.collectAsState()
-    val forecastState by viewModel.forecastState.collectAsState()
+    val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
+    val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
 
     GradientBackground()
     fun Context.findActivity(): Activity? {

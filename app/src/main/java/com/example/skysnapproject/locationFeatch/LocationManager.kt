@@ -15,10 +15,10 @@ class LocationManager(private val context: Context) {
         LocationServices.getFusedLocationProviderClient(context)
     }
 
-    var currentCity: String? = null
+    var currentCity: Location? = null
         private set
 
-    @SuppressLint("MissingPermission")
+/*    @SuppressLint("MissingPermission")
     suspend fun fetchLocation() {
         try {
             val location = fusedLocationClient.getCurrentLocation(
@@ -35,12 +35,30 @@ class LocationManager(private val context: Context) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }*/
+    @SuppressLint("MissingPermission")
+    suspend fun fetchLocation(): Location? {
+        return try {
+            val location = fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                CancellationTokenSource().token
+            ).await()
+            val finalLocation = location ?: fusedLocationClient.lastLocation.await()
+            finalLocation?.let {
+                Log.i("TAG", "fetchLocation: $it")
+            }
+            finalLocation
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
 
 
 
-   private  fun getCityName(location: Location): String {
+
+    private  fun getCityName(location: Location): String {
         return try {
             val geocoder = Geocoder(context)
             val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)

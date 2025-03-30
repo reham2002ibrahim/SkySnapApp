@@ -1,5 +1,6 @@
 package com.example.skysnapproject.dataLayer.repo
 
+import android.location.Location
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.local.LocalDataSource
@@ -12,11 +13,11 @@ class Repository private constructor(
     private val localDataSource: LocalDataSource, ) : RepositoryInterface {
 
 
-    override suspend fun getCurrentWeather(city: String): Flow<CurrentWeather> {
-        return remoteDataSource.getCurrentWeather(city)
+    override suspend fun getCurrentWeather(location: Location): Flow<CurrentWeather> {
+        return remoteDataSource.getCurrentWeather(location)
     }
-    override suspend fun getForecast(city: String): Flow<Forecast> {
-        return remoteDataSource.getForecast(city)
+    override suspend fun getForecast(location: Location): Flow<Forecast> {
+        return remoteDataSource.getForecast(location)
     }
 
 
@@ -26,11 +27,11 @@ class Repository private constructor(
     }
 
 
-    override suspend fun addPlace(place: Place): Flow< Long> {
+    override suspend fun addPlace(place: Place): Long {
         return localDataSource.insert(place)
     }
 
-    override suspend fun removePlace(place: Place): Flow< Int >{
+    override suspend fun removePlace(place: Place):  Int {
         return localDataSource.delete(place)
     }
 

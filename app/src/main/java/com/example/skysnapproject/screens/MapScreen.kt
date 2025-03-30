@@ -52,12 +52,16 @@ fun MapScreen(viewModel: WeatherViewModel) {
     var searchQuery by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 50.dp)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(top = 50.dp)) {
         Column {
             TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
                 placeholder = { Text("Search for a location") }, singleLine = true,
                 trailingIcon = {
                     IconButton(onClick = {
@@ -68,7 +72,8 @@ fun MapScreen(viewModel: WeatherViewModel) {
                                 val location = addresses[0]
                                 val latLng = LatLng(location.latitude, location.longitude)
                                 selectedPosition = latLng
-                                cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 10f)
+                                cameraPositionState.position =
+                                    CameraPosition.fromLatLngZoom(latLng, 10f)
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -100,23 +105,30 @@ fun MapScreen(viewModel: WeatherViewModel) {
 
         if (showSaveButton && selectedPosition != null) {
             Column(
-                modifier = Modifier.align(Alignment.Center).padding(16.dp)
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(16.dp)
             ) {
                 Text(
                     text = "Lat: ${selectedPosition?.latitude}, Lng: ${selectedPosition?.longitude}",
                     color = Color.Black,
-                    modifier = Modifier.background(Color.White).padding(8.dp)
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FloatingActionButton(
                     onClick = {
+                        viewModel.viewModelScope.launch {
                         selectedPosition?.let { latLng ->
-                            val adminArea = getAdminAreaName(context, latLng)
+                            val adminArea = getLocationDetails(context, latLng)
 
                             val place = Place(
-                                name = adminArea
+                                name = adminArea,
+                                lat = latLng.latitude,
+                                lng = latLng.longitude
                             )
-                            viewModel.viewModelScope.launch {
+
                                 viewModel.saveLocation(place)
                             }
                         }
@@ -130,12 +142,16 @@ fun MapScreen(viewModel: WeatherViewModel) {
         }
     }
 }
-private fun getAdminAreaName(context: Context, latLng: LatLng): String {
+
+private fun getLocationDetails(context: Context, latLng: LatLng): String {
     return try {
         val geocoder = Geocoder(context)
         val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-        addresses?.firstOrNull()?.adminArea ?: "Unknown"
+        addresses?.firstOrNull()?.let { address ->
+            "${address.subAdminArea ?: ""}, ${address.adminArea ?: "Unknown"}"
+        } ?: "Unknown Location"
     } catch (e: Exception) {
-        "Unknown"
+        "Unknown Location"
     }
 }
+

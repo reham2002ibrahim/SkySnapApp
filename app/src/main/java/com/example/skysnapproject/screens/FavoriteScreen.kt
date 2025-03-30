@@ -26,12 +26,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.skysnapproject.R
+import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.favFeatsure.FavLocationActivity
 import com.example.skysnapproject.favFeatsure.FavViewModel
 import kotlinx.coroutines.launch
@@ -72,7 +74,7 @@ fun FavoriteScreen(
                     val place = favPlaces[index]
                     place.name?.let { cityName ->
                         FavRowItemCard(
-                            cityName = cityName,onDelete = {
+                            place,onDelete = {
                                 viewModel.viewModelScope.launch {
                                     viewModel.deletePlace(place)
                                 }
@@ -99,17 +101,12 @@ fun FavoriteScreen(
     }
 }
 @Composable
-fun FavRowItemCard(cityName: String, onDelete: () -> Unit, context: Context = LocalContext.current
-) {
-
-
+fun FavRowItemCard(place: Place, onDelete: () -> Unit, context: Context = LocalContext.current) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
+        modifier = Modifier.fillMaxWidth().padding(4.dp)
             .clickable {
                 val intent = Intent(context, FavLocationActivity::class.java).apply {
-                    putExtra("CITY_NAME", cityName)
+                    putExtra("PLACE", place)
                 }
                 context.startActivity(intent)
             }
@@ -118,18 +115,26 @@ fun FavRowItemCard(cityName: String, onDelete: () -> Unit, context: Context = Lo
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp).background(Color.Transparent).padding(horizontal = 14.dp, vertical = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth().padding(12.dp)
+                .background(Color.Transparent).padding(horizontal = 14.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Start
         ) {
-            Text(
-                text = cityName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(start = 8.dp)
-            )
+            place.name?.let {
+                Text(
+                    text = it, fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier
+                        .weight(1f).padding(start = 8.dp)
+                )
+            }
             Icon(
                 imageVector = Icons.Filled.DeleteForever,
                 tint = Blue, contentDescription = "Delete",
-                modifier = Modifier.size(40.dp).clickable(onClick = onDelete)
+                modifier = Modifier.size(40.dp)
+                    .clickable(onClick = onDelete)
             )
         }
     }
 }
+
