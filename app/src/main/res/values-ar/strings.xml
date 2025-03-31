@@ -17,4 +17,6 @@
     <string name="navfav">المفضله</string>
     <string name="navalarm">التنبيه</string>
     <string name="navsettings">الاعدادات</string>
+    <string name="alarm_header">التنبيهات</string>
+    <string name="alarmDialogH">انشئ تنبيه</string>
 </resources>

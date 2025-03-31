@@ -16,5 +16,7 @@
     <string name="navfav">Favorite</string>
     <string name="navalarm">Alarm</string>
     <string name="navsettings">Settings</string>
+    <string name="alarm_header">Alarms</string>
+    <string name="alarmDialogH">Set Alarm</string>
 
 </resources>
