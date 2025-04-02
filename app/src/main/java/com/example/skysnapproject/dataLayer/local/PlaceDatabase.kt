@@ -4,10 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import androidx.room.TypeConverters
+import com.example.skysnapproject.dataLayer.models.Alert
+import com.example.skysnapproject.dataLayer.models.Converters
+import com.example.skysnapproject.dataLayer.models.Place
 
 
-@Database(entities = arrayOf(Place::class), version = 1 , exportSchema = false)
+@Database(entities = arrayOf(Place::class, Alert::class), version = 2 , exportSchema = false)
+@TypeConverters(Converters::class)
+
 abstract class PlaceDatabase : RoomDatabase() {
     abstract fun placeDao(): DAO
 

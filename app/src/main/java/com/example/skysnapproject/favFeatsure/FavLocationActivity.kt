@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.local.PlaceDatabase
 import com.example.skysnapproject.dataLayer.local.PlaceLocalDataSource
@@ -37,7 +36,6 @@ import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
 import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.locationFeatch.ErrorScreen
 import com.example.skysnapproject.locationFeatch.LoadingScreen
-import com.example.skysnapproject.locationFeatch.MyLating
 import com.example.skysnapproject.locationFeatch.WeatherContent
 import com.example.skysnapproject.locationFeatch.WeatherViewModel.Response
 import com.example.skysnapproject.screens.GradientBackground

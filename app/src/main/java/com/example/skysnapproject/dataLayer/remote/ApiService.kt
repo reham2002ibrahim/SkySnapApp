@@ -1,9 +1,8 @@
 package com.example.skysnapproject.dataLayer.remote
 
-import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
+import com.example.skysnapproject.dataLayer.models.Nominatim
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
-import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

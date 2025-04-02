@@ -1,4 +1,4 @@
-package com.example.skysnapproject.dataLayer.PlaceModels
+package com.example.skysnapproject.dataLayer.models
 
 
 data class Nominatim(

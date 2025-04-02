@@ -4,9 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.Delete
-import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import com.example.skysnapproject.dataLayer.models.Alert
+import com.example.skysnapproject.dataLayer.models.Place
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,23 +26,20 @@ interface DAO {
     suspend fun delete (place: Place) : Int
 
 
-/*
-/*
-    @Query("Select *from place")
-    suspend fun gatAll() : List<Place>
-*/
 
-    @Query("Select *from place")
-    suspend fun getFav() : List<Place>
-*/
+    @Query("Select *from alert")
+    fun getAlerts(): Flow<List<Alert>>
 
 
-/*
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(places : List<Place>)
-*/
+    suspend fun insertAlert (alert: Alert) :Long
 
-    /*    @Update
-        suspend fun update (place: Place)*/
+
+
+    @Delete
+    suspend fun deleteAlert (alert: Alert) : Int
+
+
+
 
 }

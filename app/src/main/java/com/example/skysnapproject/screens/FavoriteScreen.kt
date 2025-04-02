@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.skysnapproject.R
-import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.favFeatsure.FavLocationActivity
 import com.example.skysnapproject.favFeatsure.FavViewModel
 import kotlinx.coroutines.launch

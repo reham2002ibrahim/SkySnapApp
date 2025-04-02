@@ -1,4 +1,4 @@
-package com.example.skysnapproject.dataLayer.PlaceModels
+package com.example.skysnapproject.dataLayer.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -11,6 +11,6 @@ data class Place(
     var id: Int = 0,
     var lat:Double = 0.0,
     var lng:Double = 0.0,
-    val name: String?
+    val name: String? = "Unknown Location"
 
 ): Serializable

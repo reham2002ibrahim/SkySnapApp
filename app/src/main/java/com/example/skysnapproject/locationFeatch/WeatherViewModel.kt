@@ -6,10 +6,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
-import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import com.example.skysnapproject.dataLayer.models.Nominatim
+import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
+import com.example.skysnapproject.dataLayer.models.Alert
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -104,6 +105,52 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
         }
     }
 
+    fun saveAlert(alert: Alert) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val ans = repository.addAlert(alert)
+            if (ans > 0) Log.i("TAG", "saveAlert: added sussefully  ")
+            else Log.i("TAG", "saveAlert: can't  added  ")
+        }
+    }
+
+    private val _alerts = MutableStateFlow<List<Alert>>(emptyList())
+    val allAlerts: StateFlow<List<Alert>> = _alerts.asStateFlow()
+    init {
+        loadAlerts()
+    }
+
+    private fun loadAlerts() {
+        viewModelScope.launch (Dispatchers.IO){
+            repository.getAlerts().collect { alerts ->
+                _alerts.emit(alerts)
+            }
+        }
+    }
+    fun deleteAlert(alert: Alert) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = repository.removeAlert(alert)
+                withContext(Dispatchers.Main) {
+                    if (result > 0) {
+                        _message.emit("Deleted successfully")
+                        Log.i("DeleteAlert", "deletAlert: deleted sussefully ")
+
+                    } else {
+                        _message.emit("not found product")
+                        Log.i("DeleteAlert", "deletAlert: cant' delete ")
+                    }
+                }
+            } catch (ex: Exception) {
+                withContext(Dispatchers.Main) {
+                    _message.emit("Error: ${ex.message}")
+                }
+            }
+
+        }
+    }
+
+
+
 
     sealed class Response<out T> {
         object Loading : Response<Nothing>()
@@ -144,6 +191,11 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+
+
+
+
+    // for alarm
 
 
 }

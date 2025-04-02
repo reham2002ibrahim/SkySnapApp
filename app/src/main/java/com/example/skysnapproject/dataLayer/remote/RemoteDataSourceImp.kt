@@ -6,8 +6,7 @@ import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.Response
-import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
+import com.example.skysnapproject.dataLayer.models.Nominatim
 
 
 class RemoteDataSourceImpl(private val apiService: ApiService) : RemoteDataSource {

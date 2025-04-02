@@ -1,12 +1,14 @@
 package com.example.skysnapproject.screens
 
+import android.app.Activity
 import android.content.Context
-import android.location.Geocoder
+import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -17,8 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import com.example.skysnapproject.dataLayer.models.Alert
 import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import com.example.skysnapproject.utils.savePlaceToSharedPreferences
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -27,8 +32,9 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
+
 @Composable
-fun MapScreen(viewModel: WeatherViewModel) {
+fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
 
     var searchQuery by remember { mutableStateOf("") }
     val searchResults by viewModel.searchLocationState.collectAsState(initial = WeatherViewModel.Response.Loading)
@@ -53,16 +59,20 @@ fun MapScreen(viewModel: WeatherViewModel) {
 
                 showSearchResults = true
             }
+
             is WeatherViewModel.Response.Failure -> {
                 // habdel
             }
+
             is WeatherViewModel.Response.Loading -> {
                 // habdel
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top = 20.dp)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(top = 20.dp)) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -81,7 +91,10 @@ fun MapScreen(viewModel: WeatherViewModel) {
             }
         }
 
-        Column(modifier = Modifier.fillMaxWidth().padding(16.dp).align(Alignment.TopCenter)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .align(Alignment.TopCenter)) {
             TextField(
                 value = searchQuery,
                 onValueChange = {
@@ -94,7 +107,9 @@ fun MapScreen(viewModel: WeatherViewModel) {
             )
 
             if (showSearchResults && searchQuery.length >= 2) {
-                LazyColumn(modifier = Modifier.fillMaxWidth().background(Color.White)) {
+                LazyColumn(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)) {
                     when (val result = searchResults) {
                         is WeatherViewModel.Response.Success -> {
                             items(result.data) { resultItem ->
@@ -103,18 +118,24 @@ fun MapScreen(viewModel: WeatherViewModel) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            val latLng = LatLng(resultItem.lat.toDouble(), resultItem.lon.toDouble())
+                                            val latLng = LatLng(
+                                                resultItem.lat.toDouble(),
+                                                resultItem.lon.toDouble()
+                                            )
                                             selectedPosition = latLng
-                                            cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
+                                            cameraPositionState.position =
+                                                CameraPosition.fromLatLngZoom(latLng, 15f)
                                             showSearchResults = false
                                         }
                                         .padding(8.dp)
                                 )
                             }
                         }
+
                         is WeatherViewModel.Response.Failure -> {
                             // hansl error
                         }
+
                         is WeatherViewModel.Response.Loading -> {
                             // hansl error
                         }
@@ -147,7 +168,14 @@ fun MapScreen(viewModel: WeatherViewModel) {
                                     lat = latLng.latitude,
                                     lng = latLng.longitude
                                 )
-                                viewModel.saveLocation(place)
+
+                                savePlaceToSharedPreferences(context, place)
+                                navController.previousBackStackEntry?.savedStateHandle?.set(
+                                    "MAP_RESULT",
+                                    true
+                                )
+                                navController.popBackStack()
+                                //  انا هنا عايزه اما يدوس سيف ارجع popStack بس عايزه اخد وانا راجعه في sharedPrefrance مثلا كل معلومات ال  val place = Place(
                             }
                         }
                         showSaveButton = false
@@ -162,14 +190,4 @@ fun MapScreen(viewModel: WeatherViewModel) {
 }
 
 
- fun getLocationDetails(context: Context, latLng: LatLng): String {
-    return try {
-        val geocoder = Geocoder(context)
-        val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-        addresses?.firstOrNull()?.let { address ->
-            "${address.subAdminArea ?: ""}, ${address.adminArea ?: "Unknown"}"
-        } ?: "Unknown Location"
-    } catch (e: Exception) {
-        "Unknown Location"
-    }
-}
+

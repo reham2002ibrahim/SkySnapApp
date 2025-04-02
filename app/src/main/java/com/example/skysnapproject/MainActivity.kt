@@ -33,7 +33,7 @@ fun AppScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val showBottomBar =( currentDestination?.route != "Splash"
-            && currentDestination?.route != "map" )
+            && currentDestination?.route != "map" )&& currentDestination?.route != "alertMap"
 
     Scaffold(
         bottomBar = {

@@ -1,5 +1,7 @@
 package com.example.skysnapproject.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,10 +19,12 @@ import com.example.skysnapproject.screens.FavoriteScreen
 import com.example.skysnapproject.locationFeatch.HomeScreen
 import com.example.skysnapproject.locationFeatch.LocationManager
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import com.example.skysnapproject.screens.MapOfAlert
 import com.example.skysnapproject.screens.MapScreen
 import com.example.skysnapproject.screens.SettingsScreen
 import com.example.skysnapproject.screens.SplashScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomNavGraph(navController: NavHostController) {
     NavHost(
@@ -63,6 +67,20 @@ fun BottomNavGraph(navController: NavHostController) {
             )
             MapScreen(viewModel = viewModel)
         }
+        composable("alertMap") {
+            val context = LocalContext.current
+            val viewModel: WeatherViewModel = viewModel(
+                factory = WeatherViewModel.WeatherViewModelFactory(
+                    Repository.getInstance(
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        localDataSource = PlaceLocalDataSource(
+                            dao = PlaceDatabase.getInstance(context).placeDao()
+                        )
+                    )
+                )
+            )
+            MapOfAlert(viewModel = viewModel, navController)
+        }
 
 
         composable(BottomBarRoutes.FavRoute.title) {
@@ -82,7 +100,18 @@ fun BottomNavGraph(navController: NavHostController) {
 
 
         composable(BottomBarRoutes.AlarmRoute.title) {
-            AlarmScreen()
+            val context = LocalContext.current
+            val viewModel: WeatherViewModel = viewModel(
+                factory = WeatherViewModel.WeatherViewModelFactory(
+                    Repository.getInstance(
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        localDataSource = PlaceLocalDataSource(
+                            dao = PlaceDatabase.getInstance(context).placeDao()
+                        )
+                    )
+                )
+            )
+            AlarmScreen(navController = navController,viewModel = viewModel)
         }
         composable(BottomBarRoutes.SettingsRoute.title) {
             SettingsScreen()

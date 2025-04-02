@@ -1,15 +1,14 @@
 package com.example.skysnapproject.dataLayer.repo
 
 import android.location.Location
-import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
+import com.example.skysnapproject.dataLayer.models.Nominatim
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.local.LocalDataSource
-import com.example.skysnapproject.dataLayer.PlaceModels.Place
+import com.example.skysnapproject.dataLayer.models.Alert
+import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.dataLayer.remote.RemoteDataSource
-import com.example.skysnapproject.dataLayer.remote.RetrofitHelper.apiService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class Repository private constructor(
     private val remoteDataSource: RemoteDataSource,
@@ -39,6 +38,19 @@ class Repository private constructor(
 
     override suspend fun removePlace(place: Place):  Int {
         return localDataSource.delete(place)
+    }
+
+    override suspend fun getAlerts(): Flow<List<Alert>> {
+        return localDataSource.getAlerts()
+    }
+
+    override suspend fun addAlert(alert: Alert): Long {
+        return localDataSource.insertAlert(alert)
+    }
+
+    override suspend fun removeAlert(alert: Alert): Int {
+        return localDataSource.deleteAlert(alert)
+
     }
 
     companion object {
