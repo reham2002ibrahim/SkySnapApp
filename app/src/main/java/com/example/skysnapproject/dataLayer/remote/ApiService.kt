@@ -1,5 +1,6 @@
 package com.example.skysnapproject.dataLayer.remote
 
+import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import kotlinx.coroutines.flow.Flow
@@ -14,8 +15,8 @@ interface ApiService {
 
     @GET("weather")
     suspend fun getCurrentWeather(
-        @Query("lat") lat: Double =  0.0 ,
-        @Query("lon") lng: Double =  0.0 ,
+        @Query("lat") lat: Double = 0.0,
+        @Query("lon") lng: Double = 0.0,
         @Query("units") units: String = "metric",
         @Query("appid") apiKey: String
     ): Response<CurrentWeather>
@@ -23,25 +24,15 @@ interface ApiService {
 
     @GET("forecast")
     suspend fun getForecast(
-        @Query("lat") lat: Double =  0.0 ,
-        @Query("lon") lng: Double =  0.0 ,
+        @Query("lat") lat: Double = 0.0,
+        @Query("lon") lng: Double = 0.0,
         @Query("units") units: String = "metric",
         @Query("appid") apiKey: String
     ): Response<Forecast>
 
-    /*    @GET("weather")
-        suspend fun getCurrentWeather(
-            @Query ("q") city : String ,
-            @Query ("units") units : String = "metric" ,
-            @Query ("appid") apiKey : String
-        ) :Response<CurrentWeather>*/
-    /*    @GET("forecast")
-        suspend fun getForecast(
-            @Query("q") city: String,
-            @Query("units") units: String = "metric",
-            @Query("appid") apiKey: String
-        ): Response<Forecast>*/
-
-
-
+    @GET("https://nominatim.openstreetmap.org/search")
+    suspend fun searchLocation(
+        @Query("q") query: String,
+        @Query("format") format: String = "json"
+    ): Response<List<Nominatim>>
 }

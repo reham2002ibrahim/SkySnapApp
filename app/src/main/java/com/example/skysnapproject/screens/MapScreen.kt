@@ -3,31 +3,22 @@ package com.example.skysnapproject.screens
 import android.content.Context
 import android.location.Geocoder
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
 import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
 import com.google.android.gms.maps.model.CameraPosition
@@ -38,67 +29,98 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
-
-
 @Composable
 fun MapScreen(viewModel: WeatherViewModel) {
 
+    var searchQuery by remember { mutableStateOf("") }
+    val searchResults by viewModel.searchLocationState.collectAsState(initial = WeatherViewModel.Response.Loading)
+
     var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
+    var showSearchResults by remember { mutableStateOf(true) }
+    var showSaveButton by remember { mutableStateOf(false) }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(30.0240858, 31.2476), 10f)
     }
-
-    var showSaveButton by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(top = 50.dp)) {
-        Column {
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.length > 2) {
+            viewModel.getSearchLocation(searchQuery)
+        }
+    }
+
+    LaunchedEffect(searchResults) {
+        when (val result = searchResults) {
+            is WeatherViewModel.Response.Success -> {
+
+                showSearchResults = true
+            }
+            is WeatherViewModel.Response.Failure -> {
+                // habdel
+            }
+            is WeatherViewModel.Response.Loading -> {
+                // habdel
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize().padding(top = 20.dp)) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(zoomControlsEnabled = true),
+            onMapClick = { latLng ->
+                selectedPosition = latLng
+                showSaveButton = true
+            }
+        ) {
+            selectedPosition?.let {
+                Marker(
+                    state = MarkerState(position = it),
+                    title = "Selected Location",
+                    snippet = "Lat: ${it.latitude}, Lng: ${it.longitude}"
+                )
+            }
+        }
+
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp).align(Alignment.TopCenter)) {
             TextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                placeholder = { Text("Search for a location") }, singleLine = true,
-                trailingIcon = {
-                    IconButton(onClick = {
-                        val geocoder = Geocoder(context)
-                        try {
-                            val addresses = geocoder.getFromLocationName(searchQuery, 1)
-                            if (addresses != null && addresses.isNotEmpty()) {
-                                val location = addresses[0]
-                                val latLng = LatLng(location.latitude, location.longitude)
-                                selectedPosition = latLng
-                                cameraPositionState.position =
-                                    CameraPosition.fromLatLngZoom(latLng, 10f)
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
-                    }
-                }
+                onValueChange = {
+                    searchQuery = it
+                    showSearchResults = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Search for a location") },
+                singleLine = true
             )
 
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                uiSettings = MapUiSettings(zoomControlsEnabled = true),
-                onMapClick = { latLng ->
-                    selectedPosition = latLng
-                    showSaveButton = true
-                }
-            ) {
-                selectedPosition?.let {
-                    Marker(
-                        state = MarkerState(position = it),
-                        title = "Selected Location",
-                        snippet = "Lat: ${it.latitude}, Lng: ${it.longitude}"
-                    )
+            if (showSearchResults && searchQuery.length >= 2) {
+                LazyColumn(modifier = Modifier.fillMaxWidth().background(Color.White)) {
+                    when (val result = searchResults) {
+                        is WeatherViewModel.Response.Success -> {
+                            items(result.data) { resultItem ->
+                                Text(
+                                    text = resultItem.display_name,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val latLng = LatLng(resultItem.lat.toDouble(), resultItem.lon.toDouble())
+                                            selectedPosition = latLng
+                                            cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
+                                            showSearchResults = false
+                                        }
+                                        .padding(8.dp)
+                                )
+                            }
+                        }
+                        is WeatherViewModel.Response.Failure -> {
+                            // hansl error
+                        }
+                        is WeatherViewModel.Response.Loading -> {
+                            // hansl error
+                        }
+                    }
                 }
             }
         }
@@ -120,15 +142,13 @@ fun MapScreen(viewModel: WeatherViewModel) {
                 FloatingActionButton(
                     onClick = {
                         viewModel.viewModelScope.launch {
-                        selectedPosition?.let { latLng ->
-                            val adminArea = getLocationDetails(context, latLng)
-
-                            val place = Place(
-                                name = adminArea,
-                                lat = latLng.latitude,
-                                lng = latLng.longitude
-                            )
-
+                            selectedPosition?.let { latLng ->
+                                val adminArea = getLocationDetails(context, latLng)
+                                val place = Place(
+                                    name = adminArea,
+                                    lat = latLng.latitude,
+                                    lng = latLng.longitude
+                                )
                                 viewModel.saveLocation(place)
                             }
                         }
@@ -143,6 +163,7 @@ fun MapScreen(viewModel: WeatherViewModel) {
     }
 }
 
+
 private fun getLocationDetails(context: Context, latLng: LatLng): String {
     return try {
         val geocoder = Geocoder(context)
@@ -154,4 +175,3 @@ private fun getLocationDetails(context: Context, latLng: LatLng): String {
         "Unknown Location"
     }
 }
-

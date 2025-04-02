@@ -1,12 +1,15 @@
 package com.example.skysnapproject.dataLayer.repo
 
 import android.location.Location
+import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.local.LocalDataSource
 import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.remote.RemoteDataSource
+import com.example.skysnapproject.dataLayer.remote.RetrofitHelper.apiService
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class Repository private constructor(
     private val remoteDataSource: RemoteDataSource,
@@ -20,6 +23,9 @@ class Repository private constructor(
         return remoteDataSource.getForecast(location)
     }
 
+    override suspend fun searchLocation(query: String): Flow<List<Nominatim>> {
+        return remoteDataSource.searchLocation(query)
+    }
 
     override suspend fun getFavPlace(): Flow<List<Place>> {
         return localDataSource.getFavPlaces()

@@ -6,13 +6,17 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.skysnapproject.dataLayer.PlaceModels.Nominatim
 import com.example.skysnapproject.dataLayer.PlaceModels.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.repo.RepositoryInterface
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,23 +31,16 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
     private val _forecastState = MutableStateFlow<Response<Forecast>>(Response.Loading)
     val forecastState: StateFlow<Response<Forecast>> = _forecastState.asStateFlow()
 
+
+    private val _searchLocationState = MutableSharedFlow<Response<List<Nominatim>>>()
+    val searchLocationState: SharedFlow<Response<List<Nominatim>>> = _searchLocationState.asSharedFlow()
+
+
+
     private val _message = MutableStateFlow("")
     val message: StateFlow<String> = _message.asStateFlow()
 
 
-    /*  fun fetchLocation(context: Context) {
-          viewModelScope.launch(Dispatchers.IO) {
-              val locationManager = LocationManager(context)
-             locationManager.fetchLocation()
-              val city = locationManager.currentCity
-              city?.let {
-                  withContext(Dispatchers.Main) {
-                      getCurrentWeather(it)
-                      getForecast(it)
-                  }
-              }
-          }
-      }*/
     fun fetchLocation(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val locationManager = LocationManager(context)
@@ -76,7 +73,7 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
     }
 
 
-    //  ******* forecast data
+    //  forecast data
 
     fun getForecast(location: Location) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -113,6 +110,27 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
         data class Success<T>(val data: T) : Response<T>()
         data class Failure(val error: Throwable) : Response<Nothing>()
     }
+
+
+    // search location
+    fun getSearchLocation(query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _searchLocationState.emit(Response.Loading)
+            try {
+                repository.searchLocation(query)
+                    .collect { searchResults ->
+                        withContext(Dispatchers.Main) {
+                            _searchLocationState.emit(Response.Success(searchResults))
+                        }
+                    }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _searchLocationState.emit(Response.Failure(e))
+                }
+            }
+        }
+    }
+
 
 
     class WeatherViewModelFactory(
