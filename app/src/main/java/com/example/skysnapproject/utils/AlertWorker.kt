@@ -2,7 +2,9 @@ package com.example.skysnapproject.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
@@ -19,7 +21,9 @@ import com.example.skysnapproject.BuildConfig.API_KEY
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.local.PlaceDatabase
 import com.example.skysnapproject.dataLayer.models.Alert
+import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
+import com.example.skysnapproject.favFeatsure.FavLocationActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -47,8 +51,9 @@ class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineW
 
         return try {
             val weather = getWeatherData(alert.latitude, alert.longitude, API_KEY)
-            sendNotification(weather.weather.firstOrNull()?.description ?: "No data available")
-          //  deleteAlertFromDatabase(applicationContext, id)
+            val place = Place(lat = alert.latitude, lng = alert.longitude, name = alert.cityName)
+
+            sendNotification(weather.weather.firstOrNull()?.description ?: "No data available", place)
             deleteAlertFromDatabase(applicationContext, alert.fromDateTime, alert.toDateTime, alert.latitude, alert.longitude)
 
             Result.success()
@@ -69,23 +74,33 @@ class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineW
         }
     }
 
-    private fun sendNotification(weatherDescription: String) {
+    private fun sendNotification(weatherDescription: String, place: Place) {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val soundUri = Uri.parse("android.resource://${applicationContext.packageName}/raw/notisound")
         val mediaPlayer = MediaPlayer.create(applicationContext, soundUri)
         mediaPlayer?.start()
 
+        val intent = Intent(applicationContext, FavLocationActivity::class.java).apply {
+            putExtra("PLACE", place)
+        }
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
 
         val notification = NotificationCompat.Builder(applicationContext, "alert_channel")
             .setContentTitle("weather status")
-            .setContentText("weather status: $weatherDescription")
+            .setContentText("${place.name}: $weatherDescription")
             .setSmallIcon(android.R.drawable.sym_def_app_icon)
             .setSound(soundUri)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setColor(Color.Red.toArgb())
+            .setContentIntent(pendingIntent)
 
 
 

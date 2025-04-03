@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.location.Location
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import androidx.compose.foundation.layout.statusBarsPadding
 
 import android.os.Bundle
 import android.util.Log
@@ -42,18 +43,6 @@ import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.ui.theme.SkySnapProjectTheme
 
 
-/*class FavLocationActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val place = intent.getParcelableExtra<Place>("PLACE")
-
-        setContent {
-            SkySnapProjectTheme {
-                FavLocationScreen(place)
-            }
-        }
-    }
-}*/
 class FavLocationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,7 +106,9 @@ fun FavLocationScreen(place: Place) {
             val weather = (weatherState as Response.Success<CurrentWeather>).data
             val forecast = (forecastState as? Response.Success)?.data
 
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize() .statusBarsPadding()
+
+            ) {
                 IconButton(
                     onClick = {
                         when (val activity = context.findActivity()) {
@@ -125,7 +116,6 @@ fun FavLocationScreen(place: Place) {
                             else -> activity.finish()
                         }
                     },
-                    modifier = Modifier.padding(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,

@@ -38,6 +38,8 @@ import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.favFeatsure.FavLocationActivity
 import com.example.skysnapproject.favFeatsure.FavViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.statusBarsPadding
+
 
 @Composable
 fun FavoriteScreen(
@@ -50,8 +52,9 @@ fun FavoriteScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
+                //.statusBarsPadding()
                 .fillMaxWidth()
-                .padding(top = 70.dp, start = 10.dp, end = 10.dp),
+                .padding(top = 70.dp,  start = 10.dp, end = 10.dp),
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally

@@ -79,6 +79,8 @@ fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
     val context = LocalContext.current
 
     GradientBackground()
+    var showDialog by remember { mutableStateOf(false) }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -103,7 +105,8 @@ fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
                             .size(400.dp)
                             .padding(top = 200.dp)
                             .clickable {
-                                //navController.navigate("map")
+                                showDialog = true
+
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -133,7 +136,7 @@ fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
         }
 
 
-        var showDialog by remember { mutableStateOf(false) }
+//        var showDialog by remember { mutableStateOf(false) }
         val mapResult = navController.currentBackStackEntry
             ?.savedStateHandle
             ?.getStateFlow<Boolean?>("MAP_RESULT", null)
@@ -161,6 +164,7 @@ fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
             )
         }
 
+        if (!allAlerts.isEmpty()) {
         FloatingActionButton(
             onClick = {
 
@@ -177,7 +181,7 @@ fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
                 contentDescription = "Add",
                 tint = Color.White
             )
-        }
+        }}
 
     }
 }
