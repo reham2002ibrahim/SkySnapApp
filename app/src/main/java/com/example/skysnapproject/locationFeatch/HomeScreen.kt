@@ -1,5 +1,6 @@
 package com.example.skysnapproject.locationFeatch
 
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,20 +52,39 @@ import com.example.skysnapproject.utils.getPreference
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun HomeScreen(viewModel: WeatherViewModel) {
     val context = LocalContext.current
 
-
     val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
     val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchLocation(context)
+    val locationPreference = getPreference(context, "location", "GPS")
+
+    val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(locationPreference) {
+        if (locationPreference == "GPS") {
+            viewModel.requestLocationPermission(context)
+        } else {
+
+            //
+
+
+        }
     }
+
+    if (locationPreference == "GPS" && !permissionState) {
+        RequestLocationPermission(viewModel = viewModel)
+    }
+
+
+
 
     GradientBackground()
 
@@ -83,7 +103,20 @@ fun HomeScreen(viewModel: WeatherViewModel) {
         }
         else -> LoadingScreen()
     }
+}
 
+@Composable
+fun RequestLocationPermission(viewModel: WeatherViewModel) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            viewModel.setPermissionGranted(granted, context)
+        }
+    )
+    LaunchedEffect(Unit) {
+        launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
 }
 
 @Composable
@@ -271,8 +304,8 @@ fun WeatherDetails(weather: CurrentWeather) {
     fun windSpeedUnit(speed: Double): String {
         val unitPreference = getPreference(context, "wind_speed_unit", "m/s")
         return when (unitPreference) {
-            "mile/hour" -> "${speed * 2.2369} mph"
-            else -> "${speed} m/s"
+            "mile/hour" -> String.format("%.3f mph", speed * 2.237)
+            else -> String.format("%.3f m/s", speed)
         }
     }
 
@@ -289,7 +322,7 @@ fun WeatherDetails(weather: CurrentWeather) {
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                WeatherData("Humidity", "${weather.main.humidity}%")
+                WeatherData("    Humidity", "${weather.main.humidity}%")
                 WeatherData("Wind Speed", "${windSpeedUnit(weather.wind.speed)}")
             }
             Row(

@@ -148,7 +148,10 @@ fun LocationCard() {
     )
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(4.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
@@ -170,14 +173,22 @@ fun LocationCard() {
             ) {
                 options.forEach { option ->
                     Row(
-                        modifier = Modifier.selectable(selected = (selectedOption == option), onClick = {
-                            selectedOption = option
-                            savePreference(context, "location", option)
-                        }),
+                        modifier = Modifier
+                            .selectable(
+                                selected = (selectedOption == option),
+                                onClick = {
+                                    selectedOption = option
+                                    savePreference(context, "location", option)
+                                }
+                            ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (selectedOption == option), onClick = { selectedOption = option; savePreference(context, "location", option) },
+                            selected = (selectedOption == option),
+                            onClick = {
+                                selectedOption = option
+                                savePreference(context, "location", option)
+                            },
                             colors = RadioButtonDefaults.colors(selectedColor = Color.White)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -308,61 +319,6 @@ fun UnitsCard() {
         }
     }
 }
-
-
-/*
-@Composable
-fun UnitsCard() {
-    val context = LocalContext.current
-    var selectedOption by remember { mutableStateOf(getPreference(context, "units", "Celsius")) }
-    val options = listOf("Celsius", "Kelvin", "Fahrenheit")
-
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(4.dp).border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(id = R.string.units_label),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                options.forEach { option ->
-                    Row(
-                        modifier = Modifier.selectable(selected = (selectedOption == option), onClick = {
-                            selectedOption = option
-                            savePreference(context, "units", option)
-                        }),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (selectedOption == option),
-                            onClick = {
-                                selectedOption = option
-                                savePreference(context, "units", option)
-                            },
-                            colors = RadioButtonDefaults.colors(selectedColor = Color.White)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = option, fontSize = 16.sp)
-                    }
-                }
-            }
-        }
-    }
-}
-*/
 
 
 

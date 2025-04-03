@@ -13,7 +13,7 @@ import kotlinx.coroutines.tasks.await
 import android.Manifest
 
 object LocationHelper {
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    lateinit var fusedLocationClient: FusedLocationProviderClient
 
     fun init(context: Context) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -35,7 +35,7 @@ object LocationHelper {
         }
     }
 
-    private fun hasLocationPermission(context: Context): Boolean {
+    fun hasLocationPermission(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION

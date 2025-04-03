@@ -21,6 +21,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
 
 
 class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel() {
@@ -36,13 +40,39 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
     private val _searchLocationState = MutableSharedFlow<Response<List<Nominatim>>>()
     val searchLocationState: SharedFlow<Response<List<Nominatim>>> = _searchLocationState.asSharedFlow()
 
-
-
     private val _message = MutableStateFlow("")
     val message: StateFlow<String> = _message.asStateFlow()
 
+    private val _permissionState = MutableStateFlow(false)
+    val permissionState: StateFlow<Boolean> get() = _permissionState.asStateFlow()
 
-    fun fetchLocation(context: Context) {
+
+
+
+fun requestLocationPermission(context: Context) {
+    if (ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        _permissionState.value = true
+        weatherWithGPS(context)
+    } else {
+        _permissionState.value = false
+    }
+}
+
+    fun setPermissionGranted(granted: Boolean , context: Context) {
+        _permissionState.value = granted
+        if (granted) {
+            weatherWithGPS(context)
+        }
+    }
+
+
+
+
+
+    fun weatherWithGPS(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val locationManager = LocationManager(context)
             val location = locationManager.fetchLocation()
@@ -52,7 +82,6 @@ class WeatherViewModel(private val repository: RepositoryInterface) : ViewModel(
             }
         }
     }
-
 
     fun getCurrentWeather(location: Location) {
         viewModelScope.launch(Dispatchers.IO) {
