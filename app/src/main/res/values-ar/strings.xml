@@ -19,4 +19,7 @@
     <string name="navsettings">الاعدادات</string>
     <string name="alarm_header">التنبيهات</string>
     <string name="alarmDialogH">انشئ تنبيه</string>
+    <string name="wind_s">متر/ثانيه</string>
+    <string name="wind_label">سرعه الرياح</string>
+    <string name="wind_h">ملي/ساعه</string>
 </resources>

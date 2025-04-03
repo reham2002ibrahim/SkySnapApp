@@ -18,5 +18,8 @@
     <string name="navsettings">Settings</string>
     <string name="alarm_header">Alarms</string>
     <string name="alarmDialogH">Set Alarm</string>
+    <string name="wind_s">meter/sec</string>
+    <string name="wind_label">Wind Speed</string>
+    <string name="wind_h">mile/hour</string>
 
 </resources>

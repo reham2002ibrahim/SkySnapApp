@@ -67,7 +67,7 @@ fun FavLocationScreen(place: Place) {
     val viewModel: WeatherViewModel = viewModel(
         factory = WeatherViewModel.WeatherViewModelFactory(
             repository = Repository.getInstance(
-                remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService, context),
                 localDataSource = PlaceLocalDataSource(
                     dao = PlaceDatabase.getInstance(LocalContext.current).placeDao()
                 )

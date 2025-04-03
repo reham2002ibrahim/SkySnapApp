@@ -42,7 +42,7 @@ fun BottomNavGraph(navController: NavHostController) {
             val viewModel: WeatherViewModel = viewModel(
                 factory = WeatherViewModel.WeatherViewModelFactory(
                     Repository.getInstance(
-                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService, context),
                         localDataSource = PlaceLocalDataSource(
                             dao = PlaceDatabase.getInstance(context).placeDao()
                         )
@@ -58,7 +58,7 @@ fun BottomNavGraph(navController: NavHostController) {
             val viewModel: WeatherViewModel = viewModel(
                 factory = WeatherViewModel.WeatherViewModelFactory(
                     Repository.getInstance(
-                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService, context),
                         localDataSource = PlaceLocalDataSource(
                             dao = PlaceDatabase.getInstance(context).placeDao()
                         )
@@ -72,7 +72,7 @@ fun BottomNavGraph(navController: NavHostController) {
             val viewModel: WeatherViewModel = viewModel(
                 factory = WeatherViewModel.WeatherViewModelFactory(
                     Repository.getInstance(
-                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService ,context),
                         localDataSource = PlaceLocalDataSource(
                             dao = PlaceDatabase.getInstance(context).placeDao()
                         )
@@ -88,7 +88,7 @@ fun BottomNavGraph(navController: NavHostController) {
             val viewModel: FavViewModel = viewModel(
                 factory = FavViewModel.FavViewModelFactory(
                     Repository.getInstance(
-                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService, context),
                         localDataSource = PlaceLocalDataSource(
                             dao = PlaceDatabase.getInstance(context).placeDao()
                         )
@@ -104,7 +104,7 @@ fun BottomNavGraph(navController: NavHostController) {
             val viewModel: WeatherViewModel = viewModel(
                 factory = WeatherViewModel.WeatherViewModelFactory(
                     Repository.getInstance(
-                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService),
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService, context),
                         localDataSource = PlaceLocalDataSource(
                             dao = PlaceDatabase.getInstance(context).placeDao()
                         )

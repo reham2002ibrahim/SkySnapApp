@@ -24,12 +24,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.skysnapproject.R
@@ -50,6 +47,7 @@ import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.forecastModel.ForecastItem
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.screens.LoaderAnimation
+import com.example.skysnapproject.utils.getPreference
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -153,9 +151,17 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
             }
 
             item {
+                var context = LocalContext.current
+                val unit = getPreference(context, "units", "Celsius")
+                val unitSymbol = when (unit) {
+                    "Celsius" -> "°C"
+                    "Fahrenheit" -> "°F"
+                    "Kelvin" -> "K"
+                    else -> "°C"
+                }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "${weather.main.temp.toInt()}°C", fontSize = 50.sp,
+                        text = "${weather.main.temp.toInt()}$unitSymbol", fontSize = 50.sp,
                         fontWeight = FontWeight.Bold, color = Color.White
                     )
                     GlideImage(
@@ -261,6 +267,15 @@ fun HourlyForecastItem(item: ForecastItem) {
 
 @Composable
 fun WeatherDetails(weather: CurrentWeather) {
+    var  context = LocalContext.current
+    fun windSpeedUnit(speed: Double): String {
+        val unitPreference = getPreference(context, "wind_speed_unit", "m/s")
+        return when (unitPreference) {
+            "mile/hour" -> "${speed * 2.2369} mph"
+            else -> "${speed} m/s"
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -269,12 +284,13 @@ fun WeatherDetails(weather: CurrentWeather) {
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
+
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
                 WeatherData("Humidity", "${weather.main.humidity}%")
-                WeatherData("Wind Speed", "${weather.wind.speed} m/s")
+                WeatherData("Wind Speed", "${windSpeedUnit(weather.wind.speed)}")
             }
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
