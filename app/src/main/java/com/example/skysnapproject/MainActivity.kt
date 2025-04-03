@@ -15,10 +15,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.skysnapproject.navigation.BottomBar
 import com.example.skysnapproject.navigation.BottomBarRoutes
 import com.example.skysnapproject.navigation.BottomNavGraph
+import com.example.skysnapproject.utils.createNotificationChannel
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel(this)
+
         enableEdgeToEdge()
         setContent {
             AppScreen()

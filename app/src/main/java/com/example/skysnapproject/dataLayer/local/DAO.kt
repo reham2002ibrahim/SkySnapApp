@@ -39,6 +39,9 @@ interface DAO {
     @Delete
     suspend fun deleteAlert (alert: Alert) : Int
 
+    @Query("DELETE FROM alert WHERE id = :alertId")
+    suspend fun deleteAlertById(alertId: String)
+
 
 
 

@@ -6,7 +6,6 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,24 +31,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Alert
-import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import com.example.skysnapproject.utils.AlertWorker
 import com.example.skysnapproject.utils.getPlaceFromSharedPreferences
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import java.util.Calendar
+import java.time.Duration
+import java.util.UUID
+import kotlin.math.log
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel: WeatherViewModel) {
+fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: WeatherViewModel) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
-   // sharedPreferences.edit().clear().apply()
+    // sharedPreferences.edit().clear().apply()
     var fromTime by remember { mutableStateOf(LocalTime.now()) }
     var showTimePickerForFrom by remember { mutableStateOf(false) }
     var toTime by remember { mutableStateOf(LocalTime.now().plusHours(1)) }
@@ -83,7 +87,6 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
             isLocationSelected = false
         }
         if (!flag) return false
-
         return when {
             fromDate == currentDate && fromTime.isBefore(currentTime) -> {
                 showToast("مينفعش تبدا زمان")
@@ -103,9 +106,6 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
             else -> true
         }
     }
-
-
-
 
 
     AlertDialog(
@@ -136,9 +136,7 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
 
                 Button(
                     onClick = {
-
-                        navController.navigate("alertMap") {
-                        }
+                        navController.navigate("alertMap")
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -155,8 +153,10 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
                     DateInputField(
                         label = "From Date",
                         date = fromDate,
-                        onClick = { if (isLocationSelected) showDatePickerForFrom = true
-                                  else showToast("Select Location First")},
+                        onClick = {
+                            if (isLocationSelected) showDatePickerForFrom = true
+                            else showToast("Select Location First")
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -168,8 +168,10 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
                     TimeInputField(
                         label = "From Time",
                         time = fromTime,
-                        onClick = { if (isLocationSelected) showTimePickerForFrom = true
-                        else showToast("Select Location First")},
+                        onClick = {
+                            if (isLocationSelected) showTimePickerForFrom = true
+                            else showToast("Select Location First")
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -181,8 +183,10 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
                     DateInputField(
                         label = "To Date",
                         date = toDate,
-                        onClick = { if (isLocationSelected) showDatePickerForTo = true
-                        else showToast("Select Location First")},
+                        onClick = {
+                            if (isLocationSelected) showDatePickerForTo = true
+                            else showToast("Select Location First")
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -194,7 +198,10 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
                     TimeInputField(
                         label = "To Time",
                         time = toTime,
-                        onClick = { if (isLocationSelected) showTimePickerForTo = true  else showToast("Select Location First")},
+                        onClick = {
+                            if (isLocationSelected) showTimePickerForTo =
+                                true else showToast("Select Location First")
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -229,23 +236,47 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
                     onClick = {
                         if (validateInputs()) {
                             val place = getPlaceFromSharedPreferences(context)
+                            val alertId = UUID.randomUUID().toString()
+
                             if (place != null) {
                                 val alert = Alert(
+                                    id = alertId,
                                     fromDateTime = LocalDateTime.of(fromDate, fromTime),
-                                    toDateTime = LocalDateTime.of(toDate, toTime).truncatedTo(
-                                        ChronoUnit.SECONDS),
+                                    toDateTime = LocalDateTime.of(toDate, toTime)
+                                        .truncatedTo(ChronoUnit.SECONDS),
                                     latitude = place.lat,
                                     longitude = place.lng,
-                                    cityName = getLocationDetails(context, LatLng(place.lat, place.lng)),
+                                    cityName = getLocationDetails(
+                                        context,
+                                        LatLng(place.lat, place.lng)
+                                    ),
                                     type = selectedOption
                                 )
+                                val workRequest = OneTimeWorkRequestBuilder<AlertWorker>()
+                                    .setInputData(
+                                        workDataOf(
+                                            "id" to alert.id,
+                                            "fromDateTime" to alert.fromDateTime.toString(),
+                                            "toDateTime" to alert.toDateTime.toString(),
+                                            "latitude" to alert.latitude,
+                                            "longitude" to alert.longitude,
+                                            "cityName" to alert.cityName,
+                                            "type" to alert.type
+                                        )
+                                    )
+                                    .build()
+
+                                val alertId = workRequest.id.toString()
+                                alert.id = alertId
+                                Log.i("TAG", "AlarmDialog: $alertId")
+                                WorkManager.getInstance(context).enqueue(workRequest)
                                 viewModel.saveAlert(alert)
-                                 sharedPreferences.edit().clear().apply()
 
+                                sharedPreferences.edit().clear().apply()
 
-                                val savedData = "From: ${fromDate} ${fromTime}, To: ${toDate} ${toTime}, Type: $selectedOption"
+                                val savedData =
+                                    "From: ${fromDate} ${fromTime}, To: ${toDate} ${toTime}, Type: $selectedOption"
                                 Log.d("AlarmDialog", "Saved Data: $savedData")
-
 
                                 onDismiss()
                             } else {
@@ -260,8 +291,6 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
             }
         }
     )
-
-
 
     if (showTimePickerForFrom) {
         TimePickerDialog(
@@ -305,73 +334,6 @@ fun AlarmDialog( onDismiss: () -> Unit, navController: NavController ,viewModel:
             },
             onDismiss = { showDatePickerForTo = false }
         )
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun TimePickerDialog(
-    initialTime: LocalTime,
-    onTimeSelected: (LocalTime) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, initialTime.hour)
-        set(Calendar.MINUTE, initialTime.minute)
-    }
-
-    DisposableEffect(Unit) {
-        val picker = android.app.TimePickerDialog(
-            context,
-            { _, hour, minute ->
-                onTimeSelected(LocalTime.of(hour, minute))
-            },
-            calendar.get(Calendar.HOUR_OF_DAY),
-            calendar.get(Calendar.MINUTE),
-            false
-        )
-
-        picker.setOnCancelListener { onDismiss() }
-        picker.show()
-
-        onDispose {
-            picker.dismiss()
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun DatePickerDialog(
-    initialDate: LocalDate,
-    onDateSelected: (LocalDate) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.YEAR, initialDate.year)
-        set(Calendar.MONTH, initialDate.monthValue - 1)
-        set(Calendar.DAY_OF_MONTH, initialDate.dayOfMonth)
-    }
-
-    DisposableEffect(Unit) {
-        val picker = android.app.DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                onDateSelected(LocalDate.of(year, month + 1, day))
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-
-        picker.setOnCancelListener { onDismiss() }
-        picker.show()
-
-        onDispose {
-            picker.dismiss()
-        }
     }
 }
 

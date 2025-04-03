@@ -35,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,6 +59,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.work.WorkManager
 import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Alert
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
@@ -65,6 +67,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +76,7 @@ import java.time.format.DateTimeFormatter
 fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
     val allAlerts by viewModel.allAlerts.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
 
     GradientBackground()
 
@@ -115,6 +120,8 @@ fun AlarmScreen(navController: NavController, viewModel: WeatherViewModel) {
                         alert = alert,
                         onDelete = {
                             viewModel.viewModelScope.launch {
+                                val storedWorkId = UUID.fromString(alert.id)
+                                WorkManager.getInstance(context).cancelWorkById(storedWorkId)
                                 viewModel.deleteAlert(alert)
                             }
                         },
@@ -284,3 +291,70 @@ fun AlertRowItemCard(alert: Alert, onDelete: () -> Unit, context: Context = Loca
         }
     }
 }
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun TimePickerDialog(
+    initialTime: LocalTime,
+    onTimeSelected: (LocalTime) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, initialTime.hour)
+        set(Calendar.MINUTE, initialTime.minute)
+    }
+
+    DisposableEffect(Unit) {
+        val picker = android.app.TimePickerDialog(
+            context,
+            { _, hour, minute ->
+                onTimeSelected(LocalTime.of(hour, minute))
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false
+        )
+
+        picker.setOnCancelListener { onDismiss() }
+        picker.show()
+
+        onDispose {
+            picker.dismiss()
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DatePickerDialog(
+    initialDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.YEAR, initialDate.year)
+        set(Calendar.MONTH, initialDate.monthValue - 1)
+        set(Calendar.DAY_OF_MONTH, initialDate.dayOfMonth)
+    }
+
+    DisposableEffect(Unit) {
+        val picker = android.app.DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                onDateSelected(LocalDate.of(year, month + 1, day))
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+
+        picker.setOnCancelListener { onDismiss() }
+        picker.show()
+
+        onDispose {
+            picker.dismiss()
+        }
+    }
+}
+
