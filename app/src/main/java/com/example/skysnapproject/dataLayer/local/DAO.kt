@@ -8,6 +8,7 @@ import androidx.room.Delete
 import com.example.skysnapproject.dataLayer.models.Alert
 import com.example.skysnapproject.dataLayer.models.Place
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 @Dao
 interface DAO {
@@ -41,6 +42,11 @@ interface DAO {
 
     @Query("DELETE FROM alert WHERE id = :alertId")
     suspend fun deleteAlertById(alertId: String)
+
+
+
+    @Query("DELETE FROM alert WHERE fromDateTime = :fdt AND toDateTime = :tdt AND latitude = :latitude AND longitude = :longitude")
+    suspend fun deleteAlertNo(fdt: LocalDateTime, tdt: LocalDateTime, latitude: Double, longitude: Double)
 
 
 

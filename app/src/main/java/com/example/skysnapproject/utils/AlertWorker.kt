@@ -3,9 +3,15 @@ package com.example.skysnapproject.utils
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.util.Log
+
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -19,7 +25,6 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.time.Duration
 import java.time.LocalDateTime
-import kotlin.math.log
 
 class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
@@ -43,7 +48,9 @@ class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineW
         return try {
             val weather = getWeatherData(alert.latitude, alert.longitude, API_KEY)
             sendNotification(weather.weather.firstOrNull()?.description ?: "No data available")
-            deleteAlertFromDatabase(applicationContext, id)
+          //  deleteAlertFromDatabase(applicationContext, id)
+            deleteAlertFromDatabase(applicationContext, alert.fromDateTime, alert.toDateTime, alert.latitude, alert.longitude)
+
             Result.success()
         } catch (e: HttpException) {
             Result.failure()
@@ -64,10 +71,24 @@ class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineW
 
     private fun sendNotification(weatherDescription: String) {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val soundUri = Uri.parse("android.resource://${applicationContext.packageName}/raw/notisound")
+        val mediaPlayer = MediaPlayer.create(applicationContext, soundUri)
+        mediaPlayer?.start()
+
+
+
         val notification = NotificationCompat.Builder(applicationContext, "alert_channel")
             .setContentTitle("weather status")
             .setContentText("weather status: $weatherDescription")
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setSmallIcon(android.R.drawable.sym_def_app_icon)
+            .setSound(soundUri)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setColor(Color.Red.toArgb())
+
+
+
             .build()
 
         notificationManager.notify(1, notification)
@@ -76,10 +97,17 @@ class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineW
 
 fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+        val soundUri = Uri.parse("android.resource://${context.packageName}/raw/notisound")
+        val attributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .build()
         val channel = NotificationChannel("alert_channel", "Weather Alerts", NotificationManager.IMPORTANCE_HIGH)
             .apply {
             description = "weather alertsNotifications"
-        }
+                setSound(soundUri, attributes)
+            }
 
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
@@ -87,10 +115,16 @@ fun createNotificationChannel(context: Context) {
 }
 
 
-private suspend fun deleteAlertFromDatabase(context: Context, alertId: String) {
+/*private suspend fun deleteAlertFromDatabase(context: Context, alertId: String) {
     val database = PlaceDatabase.getInstance(context)
     val alertDao = database.placeDao()
     alertDao.deleteAlertById(alertId)
 
 
+}*/
+private suspend fun deleteAlertFromDatabase(context: Context, fdt: LocalDateTime, tdt: LocalDateTime, latitude: Double, longitude: Double) {
+    val database = PlaceDatabase.getInstance(context)
+    val alertDao = database.placeDao()
+
+    alertDao.deleteAlertNo(fdt, tdt, latitude, longitude)
 }
