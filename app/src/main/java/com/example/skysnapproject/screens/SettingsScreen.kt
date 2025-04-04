@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.skysnapproject.R
+import com.example.skysnapproject.utils.clearSharedPrefForHome
 import com.example.skysnapproject.utils.getPreference
 import com.example.skysnapproject.utils.savePreference
 
@@ -179,6 +180,9 @@ fun LocationCard() {
                                 onClick = {
                                     selectedOption = option
                                     savePreference(context, "location", option)
+                                    if (option == "Map") {
+                                        clearSharedPrefForHome(context)
+                                    }
                                 }
                             ),
                         verticalAlignment = Alignment.CenterVertically
@@ -188,6 +192,9 @@ fun LocationCard() {
                             onClick = {
                                 selectedOption = option
                                 savePreference(context, "location", option)
+                                if (option == "Map") {
+                                    clearSharedPrefForHome(context)
+                                }
                             },
                             colors = RadioButtonDefaults.colors(selectedColor = Color.White)
                         )

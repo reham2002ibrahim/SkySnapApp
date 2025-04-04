@@ -59,9 +59,11 @@ fun HomeMap(viewModel: WeatherViewModel, navController: NavController) {
         }
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(top = 20.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 20.dp)
+    ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -80,10 +82,12 @@ fun HomeMap(viewModel: WeatherViewModel, navController: NavController) {
             }
         }
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .align(Alignment.TopCenter)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.TopCenter)
+        ) {
             TextField(
                 value = searchQuery,
                 onValueChange = {
@@ -96,9 +100,11 @@ fun HomeMap(viewModel: WeatherViewModel, navController: NavController) {
             )
 
             if (showSearchResults && searchQuery.length >= 2) {
-                LazyColumn(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                ) {
                     when (val result = searchResults) {
                         is WeatherViewModel.Response.Success -> {
                             items(result.data) { resultItem ->
@@ -155,13 +161,16 @@ fun HomeMap(viewModel: WeatherViewModel, navController: NavController) {
                                 )
 
 
-                                    setSharedPrefForHome(context, place)
+                                setSharedPrefForHome(context, place)
                                 Log.i("TAG", "HomeMap:  after saving ${place.name}")
 
 
 
                                 withContext(Dispatchers.Main) {
-                                    navController.previousBackStackEntry?.savedStateHandle?.set("MAP_RESULT", true)
+                                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                                        "MAP_RESULT",
+                                        true
+                                    )
                                     navController.popBackStack()
                                 }
                             }

@@ -30,7 +30,7 @@ import com.example.skysnapproject.screens.SplashScreen
 fun BottomNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "Alarm"
+        startDestination = "Splash"
     ) {
 
 

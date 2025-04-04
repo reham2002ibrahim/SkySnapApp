@@ -58,6 +58,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -67,7 +68,7 @@ import com.example.skysnapproject.utils.getSharedPrefForHome
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -78,70 +79,54 @@ fun HomeScreen(navController: NavController, viewModel: WeatherViewModel) {
     val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
     val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
 
-    val locationPreference = getPreference(context, "location", "GPS")
 
-    var place by remember { mutableStateOf<Place?>(null) }
-    var isLocationSelected by remember { mutableStateOf(false) }
+      val locationPreference = getPreference(context, "location", "GPS")
+      var place by remember { mutableStateOf<Place?>(null) }
+      var isLocationSelected by remember { mutableStateOf(false) }
 
-    val mapResult = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("MAP_RESULT") ?: false
+      val mapResult = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("MAP_RESULT") ?: false
 
-    LaunchedEffect(locationPreference, isLocationSelected) {
-        if (locationPreference == "GPS") {
-            viewModel.requestLocationPermission(context)
-        } else {
-            if (!isLocationSelected) {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    val savedPlace = getSharedPrefForHome(context)
-                    place = savedPlace
-                    isLocationSelected = savedPlace?.lat != 0.0 && savedPlace?.lng != 0.0
+    LaunchedEffect(locationPreference, isLocationSelected, mapResult) {
+              if (locationPreference == "GPS") {
+                  viewModel.requestLocationPermission(context)
+              } else {
+                  viewModel.viewModelScope.launch(Dispatchers.IO) {
+                      if (!isLocationSelected || mapResult) {
+                          val savedPlace = getSharedPrefForHome(context)
+                          place = savedPlace
+                          isLocationSelected = savedPlace?.lat != 0.0 && savedPlace?.lng != 0.0
 
-                    if (isLocationSelected) {
-                        val location = Location("").apply {
-                            latitude = savedPlace?.lat ?: 0.0
-                            longitude = savedPlace?.lng ?: 0.0
-                        }
-                        viewModel.getCurrentWeather(location)
-                        viewModel.getForecast(location)
-                    } else {
-                        navController.previousBackStackEntry?.savedStateHandle?.set("origin", "HomeScreen")
-                        navController.navigate("homeMap")
-                    }
-                }
-            } else {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    val savedLocation = Location("").apply {
-                        latitude = place?.lat ?: 0.0
-                        longitude = place?.lng ?: 0.0
-                    }
-                    viewModel.getCurrentWeather(savedLocation)
-                    viewModel.getForecast(savedLocation)
-                }
-            }
-        }
-    }
+                          if (isLocationSelected) {
+                              val location = Location("").apply {
+                                  latitude = savedPlace?.lat ?: 0.0
+                                  longitude = savedPlace?.lng ?: 0.0
+                              }
+                              viewModel.getCurrentWeather(location)
+                              viewModel.getForecast(location)
+                          } else {
+                              withContext(Dispatchers.Main) {
+                                  navController.previousBackStackEntry?.savedStateHandle?.set("origin", "HomeScreen")
+                                  navController.navigate("homeMap")
+                              }
+                          }
+                      } else {
+                          val savedLocation = Location("").apply {
+                              latitude = place?.lat ?: 0.0
+                              longitude = place?.lng ?: 0.0
+                          }
+                          viewModel.getCurrentWeather(savedLocation)
+                          viewModel.getForecast(savedLocation)
+                      }
 
-    LaunchedEffect(mapResult) {
-        if (mapResult && locationPreference != "GPS") {
-            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                val savedPlace = getSharedPrefForHome(context)
-                place = savedPlace
-                isLocationSelected = savedPlace?.lat != 0.0 && savedPlace?.lng != 0.0
+                      if (mapResult) {
+                          withContext(Dispatchers.Main) {
+                              navController.currentBackStackEntry?.savedStateHandle?.remove<Boolean>("MAP_RESULT")
+                          }
+                      }
+                  }
+              }
+          }
 
-                if (isLocationSelected) {
-                    val location = Location("").apply {
-                        latitude = savedPlace?.lat ?: 0.0
-                        longitude = savedPlace?.lng ?: 0.0
-                    }
-                    viewModel.getCurrentWeather(location)
-                    viewModel.getForecast(location)
-                } else {
-                    navController.previousBackStackEntry?.savedStateHandle?.set("origin", "HomeScreen")
-                    navController.navigate("homeMap")
-                }
-            }
-            navController.currentBackStackEntry?.savedStateHandle?.remove<Boolean>("MAP_RESULT")
-        }
-    }
 
     if (locationPreference == "GPS" && !permissionState) {
         RequestLocationPermission(viewModel = viewModel)
@@ -149,6 +134,7 @@ fun HomeScreen(navController: NavController, viewModel: WeatherViewModel) {
 
 
     GradientBackground()
+
 
     when (val state = weatherState) {
         is WeatherViewModel.Response.Loading -> LoadingScreen()

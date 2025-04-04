@@ -159,17 +159,16 @@ fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
                                     lng = latLng.longitude
                                 )
 
-                                val origin = navController.previousBackStackEntry?.savedStateHandle?.get<String>("origin")
-                                setSharedPrefForHome(context, place)
-                                if (origin == "HomeScreen") {
-                                    setSharedPrefForHome(context, place)
-                                    Log.i("TAG", "MapOfAlert: Data saved for HomeScreen - Name: ${place.name}, Lat: ${place.lat}, Lng: ${place.lng}")
-
-                                } else {
-                                    savePlaceToSharedPreferences(context, place)
-                                }
-
                                 withContext(Dispatchers.Main) {
+                                  /*  val origin = navController.previousBackStackEntry?.savedStateHandle?.get<String>("origin")
+                                    if (origin == "HomeScreen") {
+                                        setSharedPrefForHome(context, place)
+                                        Log.i("TAG", "MapOfAlert: Data saved forHomeScree: ${place.name}")
+                                    } else */
+                                        savePlaceToSharedPreferences(context, place)
+
+
+
                                     navController.previousBackStackEntry?.savedStateHandle?.set("MAP_RESULT", true)
                                     navController.popBackStack()
                                 }
