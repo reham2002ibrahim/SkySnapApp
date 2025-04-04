@@ -1,6 +1,8 @@
 package com.example.skysnapproject.screens
 
+import android.app.Activity
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,10 +40,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.LocaleListCompat
 import com.example.skysnapproject.R
 import com.example.skysnapproject.utils.clearSharedPrefForHome
 import com.example.skysnapproject.utils.getPreference
 import com.example.skysnapproject.utils.savePreference
+import java.util.Locale
 
 @Composable
 fun SettingsScreen() {
@@ -138,11 +143,85 @@ fun LanguageCard() {
     }
 }
 
-
 @Composable
 fun LocationCard() {
     val context = LocalContext.current
-    var selectedOption by remember { mutableStateOf(getPreference(context, "location", "GPS")) }
+    val storedPreference = getPreference(context, "location", "GPS")
+    val defaultOption = stringResource(id = R.string.location_gps)
+    val mapOption = stringResource(id = R.string.location_map)
+    val selectedOption = remember { mutableStateOf(storedPreference ?: defaultOption) }
+
+    val options = listOf(
+        defaultOption,
+        mapOption
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(id = R.string.location_label),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                options.forEach { option ->
+                    Row(
+                        modifier = Modifier
+                            .selectable(
+                                selected = (selectedOption.value == option),
+                                onClick = {
+                                    selectedOption.value = option
+                                    savePreference(context, "location", option)
+                                    if (option == mapOption) {
+                                        clearSharedPrefForHome(context)
+                                    }
+                                }
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (selectedOption.value == option),
+                            onClick = {
+                                selectedOption.value = option
+                                savePreference(context, "location", option)
+                                if (option == mapOption) {
+                                    clearSharedPrefForHome(context)
+                                }
+                            },
+                            colors = RadioButtonDefaults.colors(selectedColor = Color.White)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = option, fontSize = 16.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+/*@Composable
+fun LocationCard() {
+    val context = LocalContext.current
+    val storedPreference = getPreference(context, "location", null.toString())
+    val defaultOption = stringResource(id = R.string.location_gps)
+    var selectedOption by remember { mutableStateOf(storedPreference ?: defaultOption) }
+
+
     val options = listOf(
         stringResource(id = R.string.location_gps),
         stringResource(id = R.string.location_map)
@@ -205,7 +284,7 @@ fun LocationCard() {
             }
         }
     }
-}
+}*/
 
 @Composable
 fun WindSpeedUnitCard() {
