@@ -19,6 +19,7 @@ import com.example.skysnapproject.screens.FavoriteScreen
 import com.example.skysnapproject.locationFeatch.HomeScreen
 import com.example.skysnapproject.locationFeatch.LocationManager
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import com.example.skysnapproject.screens.HomeMap
 import com.example.skysnapproject.screens.MapOfAlert
 import com.example.skysnapproject.screens.MapScreen
 import com.example.skysnapproject.screens.SettingsScreen
@@ -49,7 +50,7 @@ fun BottomNavGraph(navController: NavHostController) {
                     )
                 )
             )
-            HomeScreen(viewModel = viewModel)
+            HomeScreen(navController,viewModel = viewModel)
         }
 
 
@@ -80,6 +81,20 @@ fun BottomNavGraph(navController: NavHostController) {
                 )
             )
             MapOfAlert(viewModel = viewModel, navController)
+        }
+        composable("homeMap") {
+            val context = LocalContext.current
+            val viewModel: WeatherViewModel = viewModel(
+                factory = WeatherViewModel.WeatherViewModelFactory(
+                    Repository.getInstance(
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService ,context),
+                        localDataSource = PlaceLocalDataSource(
+                            dao = PlaceDatabase.getInstance(context).placeDao()
+                        )
+                    )
+                )
+            )
+            HomeMap(viewModel = viewModel, navController)
         }
 
 

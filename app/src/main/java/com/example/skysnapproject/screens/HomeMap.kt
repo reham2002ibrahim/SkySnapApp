@@ -1,8 +1,6 @@
 package com.example.skysnapproject.screens
 
-import android.app.Activity
-import android.content.Context
-import android.content.SharedPreferences
+
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,12 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.skysnapproject.dataLayer.models.Alert
 import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
-import com.example.skysnapproject.utils.savePlaceToSharedPreferences
-import com.example.skysnapproject.utils.savePreference
-import com.example.skysnapproject.utils.setSharedPref
 import com.example.skysnapproject.utils.setSharedPrefForHome
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -40,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
+fun HomeMap(viewModel: WeatherViewModel, navController: NavController) {
 
     var searchQuery by remember { mutableStateOf("") }
     val searchResults by viewModel.searchLocationState.collectAsState(initial = WeatherViewModel.Response.Loading)
@@ -157,17 +151,14 @@ fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
                                     name = adminArea,
                                     lat = latLng.latitude,
                                     lng = latLng.longitude
+
                                 )
 
-                                val origin = navController.previousBackStackEntry?.savedStateHandle?.get<String>("origin")
-                                setSharedPrefForHome(context, place)
-                                if (origin == "HomeScreen") {
-                                    setSharedPrefForHome(context, place)
-                                    Log.i("TAG", "MapOfAlert: Data saved for HomeScreen - Name: ${place.name}, Lat: ${place.lat}, Lng: ${place.lng}")
 
-                                } else {
-                                    savePlaceToSharedPreferences(context, place)
-                                }
+                                    setSharedPrefForHome(context, place)
+                                Log.i("TAG", "HomeMap:  after saving ${place.name}")
+
+
 
                                 withContext(Dispatchers.Main) {
                                     navController.previousBackStackEntry?.savedStateHandle?.set("MAP_RESULT", true)
@@ -188,6 +179,4 @@ fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
         }
     }
 }
-
-
 

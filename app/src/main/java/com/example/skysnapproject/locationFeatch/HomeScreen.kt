@@ -53,37 +53,99 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import android.location.Location
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import com.example.skysnapproject.dataLayer.models.Place
+import com.example.skysnapproject.utils.getPlaceFromSharedPreferences
+import com.example.skysnapproject.utils.getSharedPrefForHome
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 
 @Composable
-fun HomeScreen(viewModel: WeatherViewModel) {
+fun HomeScreen(navController: NavController, viewModel: WeatherViewModel) {
     val context = LocalContext.current
 
     val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
     val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
+    val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
 
     val locationPreference = getPreference(context, "location", "GPS")
 
-    val permissionState by viewModel.permissionState.collectAsStateWithLifecycle()
+    var place by remember { mutableStateOf<Place?>(null) }
+    var isLocationSelected by remember { mutableStateOf(false) }
 
-    LaunchedEffect(locationPreference) {
+    val mapResult = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("MAP_RESULT") ?: false
+
+    LaunchedEffect(locationPreference, isLocationSelected) {
         if (locationPreference == "GPS") {
             viewModel.requestLocationPermission(context)
         } else {
+            if (!isLocationSelected) {
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    val savedPlace = getSharedPrefForHome(context)
+                    place = savedPlace
+                    isLocationSelected = savedPlace?.lat != 0.0 && savedPlace?.lng != 0.0
 
-            //
+                    if (isLocationSelected) {
+                        val location = Location("").apply {
+                            latitude = savedPlace?.lat ?: 0.0
+                            longitude = savedPlace?.lng ?: 0.0
+                        }
+                        viewModel.getCurrentWeather(location)
+                        viewModel.getForecast(location)
+                    } else {
+                        navController.previousBackStackEntry?.savedStateHandle?.set("origin", "HomeScreen")
+                        navController.navigate("homeMap")
+                    }
+                }
+            } else {
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    val savedLocation = Location("").apply {
+                        latitude = place?.lat ?: 0.0
+                        longitude = place?.lng ?: 0.0
+                    }
+                    viewModel.getCurrentWeather(savedLocation)
+                    viewModel.getForecast(savedLocation)
+                }
+            }
+        }
+    }
 
+    LaunchedEffect(mapResult) {
+        if (mapResult && locationPreference != "GPS") {
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                val savedPlace = getSharedPrefForHome(context)
+                place = savedPlace
+                isLocationSelected = savedPlace?.lat != 0.0 && savedPlace?.lng != 0.0
 
+                if (isLocationSelected) {
+                    val location = Location("").apply {
+                        latitude = savedPlace?.lat ?: 0.0
+                        longitude = savedPlace?.lng ?: 0.0
+                    }
+                    viewModel.getCurrentWeather(location)
+                    viewModel.getForecast(location)
+                } else {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("origin", "HomeScreen")
+                    navController.navigate("homeMap")
+                }
+            }
+            navController.currentBackStackEntry?.savedStateHandle?.remove<Boolean>("MAP_RESULT")
         }
     }
 
     if (locationPreference == "GPS" && !permissionState) {
         RequestLocationPermission(viewModel = viewModel)
     }
-
-
 
 
     GradientBackground()
