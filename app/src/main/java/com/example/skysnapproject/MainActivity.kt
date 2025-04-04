@@ -10,22 +10,39 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.skysnapproject.navigation.BottomBar
-import com.example.skysnapproject.navigation.BottomBarRoutes
 import com.example.skysnapproject.navigation.BottomNavGraph
 import com.example.skysnapproject.utils.createNotificationChannel
+import com.example.skysnapproject.utils.getPreference
+
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel(this)
 
-        enableEdgeToEdge()
+        val context = applicationContext
+        val savedLanguage = getPreference(context, "language", "English")
+        val locale = when (savedLanguage) {
+            "Arabic" -> Locale("ar", "EG")
+            else -> Locale("en", "US")
+        }
+
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+        createNotificationChannel(this)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             AppScreen()
+
         }
     }
 }

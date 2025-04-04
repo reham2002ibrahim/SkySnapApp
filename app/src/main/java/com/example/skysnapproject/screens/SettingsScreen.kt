@@ -84,7 +84,94 @@ fun SettingsScreen() {
     }
 }
 
+
+// the greate one
 @Composable
+fun LanguageCard() {
+    val context = LocalContext.current
+    var selectedOption by remember { mutableStateOf(getPreference(context, "language", "English")) }
+    val options = listOf("English", "Arabic")
+
+    LaunchedEffect(selectedOption) {
+        val currentLanguage =
+            if (Locale.getDefault().language == "ar") "Arabic" else "English"
+
+        if (selectedOption != currentLanguage) {
+            savePreference(context, "language", selectedOption)
+
+            val locale = when (selectedOption) {
+                "Arabic" -> Locale("ar", "EG")
+                else -> Locale("en", "US")
+            }
+
+            Locale.setDefault(locale)
+            val config = context.resources.configuration
+            config.setLocale(locale)
+            context.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+            if (context is Activity) {
+                context.recreate()
+            }
+        }
+    }
+
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(id = R.string.language_label),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                options.forEach { option ->
+                    Row(
+                        modifier = Modifier.selectable(
+                            selected = (selectedOption == option),
+                            onClick = { selectedOption = option }
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (selectedOption == option),
+                            onClick = { selectedOption = option },
+                            colors = RadioButtonDefaults.colors(selectedColor = Color.White)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = when (option) {
+                                "English" -> stringResource(id = R.string.language_english)
+                                "Arabic" -> stringResource(id = R.string.language_arabic)
+                                else -> option
+                            },
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+/*@Composable
 fun LanguageCard() {
     val context = LocalContext.current
     var selectedOption by remember { mutableStateOf(getPreference(context, "language", "English")) }
@@ -141,7 +228,7 @@ fun LanguageCard() {
             }
         }
     }
-}
+}*/
 
 @Composable
 fun LocationCard() {
