@@ -58,6 +58,15 @@ class FavViewModel(
         }
     }
 
+    fun saveLocation(place: Place) {
+        viewModelScope.launch(Dispatchers.IO) {
+           // val ans =
+                repository.addPlace(place)
+  /*          if (ans > 0) Log.i("TAG", "saveLocation: added sussefully  ")
+            else Log.i("TAG", "saveLocation: can't  added  ")*/
+        }
+    }
+
     class FavViewModelFactory(
         private val repository: RepositoryInterface) : ViewModelProvider.Factory {
 

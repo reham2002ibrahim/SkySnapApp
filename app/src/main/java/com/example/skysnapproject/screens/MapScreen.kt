@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.example.skysnapproject.dataLayer.models.Place
+import com.example.skysnapproject.favFeatsure.FavViewModel
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -28,7 +29,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 @Composable
-fun MapScreen(viewModel: WeatherViewModel) {
+fun MapScreen(viewModel: WeatherViewModel, favViewModel:FavViewModel) {
 
     var searchQuery by remember { mutableStateOf("") }
     val searchResults by viewModel.searchLocationState.collectAsState(initial = WeatherViewModel.Response.Loading)
@@ -147,7 +148,7 @@ fun MapScreen(viewModel: WeatherViewModel) {
                                     lat = latLng.latitude,
                                     lng = latLng.longitude
                                 )
-                                viewModel.saveLocation(place)
+                                favViewModel.saveLocation(place)
                             }
                         }
                         showSaveButton = false

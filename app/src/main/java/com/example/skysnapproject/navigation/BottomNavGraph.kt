@@ -66,7 +66,17 @@ fun BottomNavGraph(navController: NavHostController) {
                     )
                 )
             )
-            MapScreen(viewModel = viewModel)
+            val favViewModel: FavViewModel = viewModel(
+                factory = FavViewModel.FavViewModelFactory(
+                    Repository.getInstance(
+                        remoteDataSource = RemoteDataSourceImpl(RetrofitHelper.apiService, context),
+                        localDataSource = PlaceLocalDataSource(
+                            dao = PlaceDatabase.getInstance(context).placeDao()
+                        )
+                    )
+                )
+            )
+            MapScreen(viewModel = viewModel, favViewModel)
         }
         composable("alertMap") {
             val context = LocalContext.current
