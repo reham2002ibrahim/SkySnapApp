@@ -1,6 +1,5 @@
-package com.example.skysnapproject.locationFeatch
+package com.example.skysnapproject.homeFeature
 
-import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,26 +47,22 @@ import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.forecastModel.ForecastItem
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.screens.LoaderAnimation
-import com.example.skysnapproject.utils.getPreference
+import com.example.skysnapproject.sharedPref.getPreference
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import android.Manifest
 import android.location.Location
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.skysnapproject.dataLayer.models.Place
-import com.example.skysnapproject.utils.getPlaceFromSharedPreferences
-import com.example.skysnapproject.utils.getSharedPrefForHome
+import com.example.skysnapproject.sharedPref.getSharedPrefForHome
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

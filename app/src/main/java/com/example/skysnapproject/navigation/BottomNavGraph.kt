@@ -14,14 +14,13 @@ import com.example.skysnapproject.dataLayer.remote.RemoteDataSourceImpl
 import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
 import com.example.skysnapproject.dataLayer.repo.Repository
 import com.example.skysnapproject.favFeatsure.FavViewModel
-import com.example.skysnapproject.screens.AlarmScreen
-import com.example.skysnapproject.screens.FavoriteScreen
-import com.example.skysnapproject.locationFeatch.HomeScreen
-import com.example.skysnapproject.locationFeatch.LocationManager
-import com.example.skysnapproject.locationFeatch.WeatherViewModel
-import com.example.skysnapproject.screens.HomeMap
-import com.example.skysnapproject.screens.MapOfAlert
-import com.example.skysnapproject.screens.MapScreen
+import com.example.skysnapproject.alertFeature.AlarmScreen
+import com.example.skysnapproject.favFeatsure.FavoriteScreen
+import com.example.skysnapproject.homeFeature.HomeScreen
+import com.example.skysnapproject.homeFeature.WeatherViewModel
+import com.example.skysnapproject.homeFeature.HomeMap
+import com.example.skysnapproject.alertFeature.MapOfAlert
+import com.example.skysnapproject.favFeatsure.MapScreen
 import com.example.skysnapproject.screens.SettingsScreen
 import com.example.skysnapproject.screens.SplashScreen
 

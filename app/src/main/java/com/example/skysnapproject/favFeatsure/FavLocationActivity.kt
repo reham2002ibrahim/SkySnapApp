@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.location.Location
-import com.example.skysnapproject.locationFeatch.WeatherViewModel
+import com.example.skysnapproject.homeFeature.WeatherViewModel
 import androidx.compose.foundation.layout.statusBarsPadding
 
 import android.os.Bundle
@@ -14,7 +14,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -25,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.skysnapproject.dataLayer.models.Place
@@ -35,10 +33,10 @@ import com.example.skysnapproject.dataLayer.local.PlaceLocalDataSource
 import com.example.skysnapproject.dataLayer.remote.RemoteDataSourceImpl
 import com.example.skysnapproject.dataLayer.remote.RetrofitHelper
 import com.example.skysnapproject.dataLayer.repo.Repository
-import com.example.skysnapproject.locationFeatch.ErrorScreen
-import com.example.skysnapproject.locationFeatch.LoadingScreen
-import com.example.skysnapproject.locationFeatch.WeatherContent
-import com.example.skysnapproject.locationFeatch.WeatherViewModel.Response
+import com.example.skysnapproject.homeFeature.ErrorScreen
+import com.example.skysnapproject.homeFeature.LoadingScreen
+import com.example.skysnapproject.homeFeature.WeatherContent
+import com.example.skysnapproject.homeFeature.WeatherViewModel.Response
 import com.example.skysnapproject.screens.GradientBackground
 import com.example.skysnapproject.ui.theme.SkySnapProjectTheme
 

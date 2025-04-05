@@ -1,4 +1,4 @@
-package com.example.skysnapproject.screens
+package com.example.skysnapproject.alertFeature
 
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
@@ -36,18 +36,15 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Alert
-import com.example.skysnapproject.locationFeatch.WeatherViewModel
-import com.example.skysnapproject.utils.AlertWorker
-import com.example.skysnapproject.utils.getPlaceFromSharedPreferences
+import com.example.skysnapproject.favFeatsure.getLocationDetails
+import com.example.skysnapproject.homeFeature.WeatherViewModel
+import com.example.skysnapproject.sharedPref.getPlaceFromSharedPreferences
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import java.time.Duration
 import java.util.UUID
-import kotlin.math.log
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

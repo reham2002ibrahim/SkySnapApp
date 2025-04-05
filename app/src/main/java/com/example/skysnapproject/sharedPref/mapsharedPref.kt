@@ -1,4 +1,4 @@
-package com.example.skysnapproject.utils
+package com.example.skysnapproject.sharedPref
 
 import android.content.Context
 import android.content.SharedPreferences

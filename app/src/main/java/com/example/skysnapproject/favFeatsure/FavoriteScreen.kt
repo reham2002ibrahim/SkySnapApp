@@ -1,4 +1,4 @@
-package com.example.skysnapproject.screens
+package com.example.skysnapproject.favFeatsure
 
 import android.content.Context
 import android.content.Intent
@@ -35,10 +35,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Place
-import com.example.skysnapproject.favFeatsure.FavLocationActivity
-import com.example.skysnapproject.favFeatsure.FavViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.statusBarsPadding
+import com.example.skysnapproject.screens.GradientBackground
+import com.example.skysnapproject.screens.GradientText
+import com.example.skysnapproject.screens.LoaderAnimation
 
 
 @Composable

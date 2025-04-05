@@ -1,4 +1,4 @@
-package com.example.skysnapproject.utils
+package com.example.skysnapproject.alertFeature
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

@@ -1,4 +1,4 @@
-package com.example.skysnapproject.locationFeatch
+package com.example.skysnapproject.homeFeature
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder

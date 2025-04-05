@@ -1,4 +1,4 @@
-package com.example.skysnapproject.locationFeatch
+package com.example.skysnapproject.homeFeature
 
 import android.content.Context
 import android.location.Location
@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.skysnapproject.dataLayer.models.Nominatim
-import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.dataLayer.currentmodel.CurrentWeather
 import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import com.example.skysnapproject.dataLayer.models.Alert
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 
 

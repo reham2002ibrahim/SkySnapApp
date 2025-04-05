@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -15,8 +14,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.skysnapproject.navigation.BottomBar
 import com.example.skysnapproject.navigation.BottomNavGraph
-import com.example.skysnapproject.utils.createNotificationChannel
-import com.example.skysnapproject.utils.getPreference
+import com.example.skysnapproject.alertFeature.createNotificationChannel
+import com.example.skysnapproject.sharedPref.getPreference
 
 import java.util.Locale
 

@@ -1,4 +1,4 @@
-package com.example.skysnapproject.screens
+package com.example.skysnapproject.homeFeature
 
 
 import android.util.Log
@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -22,8 +21,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Place
-import com.example.skysnapproject.locationFeatch.WeatherViewModel
-import com.example.skysnapproject.utils.setSharedPrefForHome
+import com.example.skysnapproject.favFeatsure.getLocationDetails
+import com.example.skysnapproject.sharedPref.setSharedPrefForHome
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap

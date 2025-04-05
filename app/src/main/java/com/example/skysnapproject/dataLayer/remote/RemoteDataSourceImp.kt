@@ -8,7 +8,7 @@ import com.example.skysnapproject.dataLayer.forecastModel.Forecast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import com.example.skysnapproject.dataLayer.models.Nominatim
-import com.example.skysnapproject.utils.getPreference
+import com.example.skysnapproject.sharedPref.getPreference
 
 
 class RemoteDataSourceImpl(private val apiService: ApiService, private val context: Context) : RemoteDataSource {
