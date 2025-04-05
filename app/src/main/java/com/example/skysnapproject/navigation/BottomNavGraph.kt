@@ -38,7 +38,7 @@ fun BottomNavGraph(navController: NavHostController) {
             SplashScreen(navController = navController)
         }
 
-        composable(BottomBarRoutes.HomeRoute.title) {
+        composable(BottomBarRoutes.HomeRoute.route) {
             val context = LocalContext.current
             val viewModel: WeatherViewModel = viewModel(
                 factory = WeatherViewModel.WeatherViewModelFactory(
@@ -108,7 +108,7 @@ fun BottomNavGraph(navController: NavHostController) {
         }
 
 
-        composable(BottomBarRoutes.FavRoute.title) {
+        composable(BottomBarRoutes.FavRoute.route) {
             val context = LocalContext.current
             val viewModel: FavViewModel = viewModel(
                 factory = FavViewModel.FavViewModelFactory(
@@ -124,7 +124,7 @@ fun BottomNavGraph(navController: NavHostController) {
         }
 
 
-        composable(BottomBarRoutes.AlarmRoute.title) {
+        composable(BottomBarRoutes.AlarmRoute.route) {
             val context = LocalContext.current
             val viewModel: WeatherViewModel = viewModel(
                 factory = WeatherViewModel.WeatherViewModelFactory(
@@ -138,7 +138,7 @@ fun BottomNavGraph(navController: NavHostController) {
             )
             AlarmScreen(navController = navController,viewModel = viewModel)
         }
-        composable(BottomBarRoutes.SettingsRoute.title) {
+        composable(BottomBarRoutes.SettingsRoute.route) {
             SettingsScreen()
         }
     }

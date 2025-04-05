@@ -37,4 +37,8 @@
     <string name="clouds">السحب</string>
     <string name="hpa">هكتوباسكال</string>
     <string name="percent">%</string>
+    <string name="nav_home">الرئيسيه</string>
+    <string name="nav_fav">المفضلات</string>
+    <string name="nav_alrm">التنبيهات</string>
+    <string name="nav_set">الاعدادات</string>
 </resources>

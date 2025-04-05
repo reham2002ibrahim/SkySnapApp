@@ -36,5 +36,9 @@
     <string name="clouds">Clouds</string>
     <string name="hpa">hPa</string>
     <string name="percent">%</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_fav">Favorites</string>
+    <string name="nav_alrm">Alarm</string>
+    <string name="nav_set">Settings</string>
 
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -49,17 +50,17 @@ fun BottomBar(navController: NavHostController) {
                 icon = {
                     Icon(
                         painter = painterResource(id = item.icon),
-                        contentDescription = item.title,
+                        contentDescription = null,
                         tint = if (selectedItem == index) Color(0xFF6200EE) else Color.Gray
                     )
                 },
                 label = {
-                    Text(text = item.title, fontSize = 18.sp, color = if (selectedItem == index) Color(0xFF6200EE) else Color.Gray)
+                    Text(text =  stringResource(id = item.titleResId), fontSize = 18.sp, color = if (selectedItem == index) Color(0xFF6200EE) else Color.Gray)
                 },
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
-                    navController.navigate(item.title) {
+                    navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }

@@ -15,6 +15,7 @@ class RemoteDataSourceImpl(private val apiService: ApiService, private val conte
 
     override suspend fun getCurrentWeather(location: Location): Flow<CurrentWeather> {
         return flow {
+
             val unit = when (getPreference(context, "units", "Celsius")) {
                 "Celsius" -> "metric"
                 "Fahrenheit" -> "imperial"
