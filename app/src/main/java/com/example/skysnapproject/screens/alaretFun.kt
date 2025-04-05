@@ -142,7 +142,7 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = if (isLocationSelected) "Location Selected" else "Select Location",
+                        text = if (isLocationSelected) stringResource(id = R.string.loc_selected) else stringResource(id = R.string.chose_loc),
                         color = Color.White
                     )
                 }
@@ -151,7 +151,7 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     DateInputField(
-                        label = "From Date",
+                        label = stringResource(id = R.string.fromdate),
                         date = fromDate,
                         onClick = {
                             if (isLocationSelected) showDatePickerForFrom = true
@@ -166,7 +166,7 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TimeInputField(
-                        label = "From Time",
+                        label = stringResource(id = R.string.from_time),
                         time = fromTime,
                         onClick = {
                             if (isLocationSelected) showTimePickerForFrom = true
@@ -181,7 +181,7 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     DateInputField(
-                        label = "To Date",
+                        label = stringResource(id = R.string.todate),
                         date = toDate,
                         onClick = {
                             if (isLocationSelected) showDatePickerForTo = true
@@ -196,7 +196,7 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TimeInputField(
-                        label = "To Time",
+                        label = stringResource(id = R.string.totime),
                         time = toTime,
                         onClick = {
                             if (isLocationSelected) showTimePickerForTo =
@@ -212,14 +212,14 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                 ) {
 
                     RadioButtonWithLabel(
-                        label = "Notification",
+                        label = stringResource(id = R.string.notification),
                         selected = selectedOption == "Notification",
                         onClick = { selectedOption = "Notification" }
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
                     RadioButtonWithLabel(
-                        label = "Alarm",
+                        label = stringResource(id = R.string.alarm),
                         selected = selectedOption == "Alarm",
                         onClick = { selectedOption = "Alarm" }
                     )
@@ -285,7 +285,7 @@ fun AlarmDialog(onDismiss: () -> Unit, navController: NavController, viewModel: 
                         }
                     }
                 ) {
-                    Text(text = "Save")
+                    Text(text =stringResource(id = R.string.save))
                 }
 
             }

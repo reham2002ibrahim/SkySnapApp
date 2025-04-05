@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Alert
 import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
@@ -97,7 +99,7 @@ fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
                     showSearchResults = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search for a location") },
+                placeholder = { Text(stringResource(id = R.string.ser_loc)) },
                 singleLine = true
             )
 
@@ -180,7 +182,7 @@ fun MapOfAlert(viewModel: WeatherViewModel, navController: NavController) {
                     },
                     containerColor = Color(0xFF88698A)
                 ) {
-                    Text(text = "Save", color = Color.White)
+                    Text(text = stringResource(id = R.string.save), color = Color.White)
                 }
 
             }

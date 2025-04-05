@@ -15,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import com.example.skysnapproject.R
 import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.favFeatsure.FavViewModel
 import com.example.skysnapproject.locationFeatch.WeatherViewModel
@@ -90,7 +92,7 @@ fun MapScreen(viewModel: WeatherViewModel, favViewModel:FavViewModel) {
                     showSearchResults = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search for a location") },
+                placeholder = { Text(stringResource(id = R.string.ser_loc)) },
                 singleLine = true
             )
 

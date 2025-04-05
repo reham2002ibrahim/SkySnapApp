@@ -41,4 +41,16 @@
     <string name="nav_fav">المفضلات</string>
     <string name="nav_alrm">التنبيهات</string>
     <string name="nav_set">الاعدادات</string>
+    <string name="chose_loc">اختر موقع</string>
+    <string name="loc_selected">تم اختيار الموقع</string>
+    <string name="fromdate">من تاريخ</string>
+    <string name="from_time">من وقت</string>
+    <string name="todate">الي تاريخ</string>
+    <string name="totime">الي وقت</string>
+    <string name="save">حفظ</string>
+    <string name="notification">اشعار</string>
+    <string name="alarm">منبه</string>
+    <string name="ser_loc">ابحث عن موقع</string>
+
+
 </resources>

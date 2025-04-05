@@ -40,5 +40,15 @@
     <string name="nav_fav">Favorites</string>
     <string name="nav_alrm">Alarm</string>
     <string name="nav_set">Settings</string>
+    <string name="chose_loc">Select Location</string>
+    <string name="loc_selected">Location Selected</string>
+    <string name="fromdate">From Date</string>
+    <string name="from_time">From Time</string>
+    <string name="todate">To Date</string>
+    <string name="totime">To Time</string>
+    <string name="save">Save</string>
+    <string name="notification">Notification</string>
+    <string name="alarm">Alarm</string>
+    <string name="ser_loc">Search for a location</string>
 
 </resources>
