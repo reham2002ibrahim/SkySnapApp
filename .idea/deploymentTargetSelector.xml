@@ -13,19 +13,27 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="delete_insertPlaceAndDeleteIt_checkDeletion()">
+      <SelectionState runConfigName="getFavPlace_false_runBlocking()">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-04-05T03:26:57.672424200Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\reham\.android\avd\Pixel_4a_API_35.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="getFavPlace_returnAllPlaces()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="getAllFavPlaces()">
+      <SelectionState runConfigName="removePlace_towPlacesAndDeleteone_returnSizeEqulOne()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PlaceLocalDataSourceTest">
+      <SelectionState runConfigName="removePlace_removeOne_returnOnePlace()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DAOTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="checkDeleteFun()">
+      <SelectionState runConfigName="searchLocation_returnMockLocations()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
