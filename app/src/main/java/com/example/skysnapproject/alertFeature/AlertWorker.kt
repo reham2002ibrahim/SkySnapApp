@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.skysnapproject.BuildConfig.API_KEY
@@ -48,18 +49,27 @@ class AlertWorker(context: Context, workerParams: WorkerParameters) : CoroutineW
         if (delay > 0) {
             kotlinx.coroutines.delay(delay)
         }
+        val notificationManager = NotificationManagerCompat.from(applicationContext)
+        var remainingTime = Duration.between(LocalDateTime.now(), alert.toDateTime).toMillis()
 
-        return try {
-            val weather = getWeatherData(alert.latitude, alert.longitude, API_KEY)
-            val place = Place(lat = alert.latitude, lng = alert.longitude, name = alert.cityName)
+        while (remainingTime > 0) {
+            if (notificationManager.areNotificationsEnabled()) {
+                val weather = getWeatherData(alert.latitude, alert.longitude, API_KEY)
+                val place = Place(lat = alert.latitude, lng = alert.longitude, name = alert.cityName)
 
-            sendNotification(weather.weather.firstOrNull()?.description ?: "No data available", place)
-            deleteAlertFromDatabase(applicationContext, alert.fromDateTime, alert.toDateTime, alert.latitude, alert.longitude)
+                sendNotification(weather.weather.firstOrNull()?.description ?: "No data available", place)
+                deleteAlertFromDatabase(applicationContext, alert.fromDateTime, alert.toDateTime, alert.latitude, alert.longitude)
 
-            Result.success()
-        } catch (e: HttpException) {
-            Result.failure()
+                return Result.success()
+            } else {
+                kotlinx.coroutines.delay(2000L)
+                remainingTime = Duration.between(LocalDateTime.now(), alert.toDateTime).toMillis()
+            }
         }
+
+        deleteAlertFromDatabase(applicationContext, alert.fromDateTime, alert.toDateTime, alert.latitude, alert.longitude)
+
+        return Result.failure()
     }
 
     private suspend fun getWeatherData(latitude: Double, longitude: Double, apiKey: String): CurrentWeather {
