@@ -10,7 +10,7 @@ import com.example.skysnapproject.dataLayer.models.Place
 import com.example.skysnapproject.dataLayer.remote.RemoteDataSource
 import kotlinx.coroutines.flow.Flow
 
-class Repository private constructor(
+class Repository  (
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource, ) : RepositoryInterface {
 
