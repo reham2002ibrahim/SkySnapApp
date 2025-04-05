@@ -51,6 +51,9 @@
     <string name="notification">اشعار</string>
     <string name="alarm">منبه</string>
     <string name="ser_loc">ابحث عن موقع</string>
+    <string name="delete">مسح</string>
+    <string name="close">اغلاق</string>
+    <string name="confirm_delete">هل متأكد من مسح هذا المكان؟</string>
 
 
 </resources>

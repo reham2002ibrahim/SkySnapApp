@@ -14,12 +14,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AlarmAdd
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +52,10 @@ fun FavoriteScreen(
 ) {
 
     val favPlaces by viewModel.favPlaces.collectAsStateWithLifecycle()
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val placeToDelete = remember { mutableStateOf<Place?>(null) }
+
+
 
     GradientBackground()
     Box(modifier = Modifier.fillMaxSize()) {
@@ -86,15 +95,23 @@ fun FavoriteScreen(
                     place.name?.let { cityName ->
                         FavRowItemCard(
                             place, onDelete = {
-                                viewModel.viewModelScope.launch {
-                                    viewModel.deletePlace(place)
-                                }
+
+                                placeToDelete.value = place
+                                showDeleteDialog.value = true
+
                             }
                         )
                     }
                 }
             }
 
+        }
+        if (showDeleteDialog.value && placeToDelete.value != null) {
+            deleteDialog(
+                viewModel = viewModel,
+                place = placeToDelete.value!!,
+                onDismiss = { showDeleteDialog.value = false }
+            )
         }
         if (favPlaces.isNotEmpty()) {
             FloatingActionButton(
@@ -163,3 +180,63 @@ fun FavRowItemCard(place: Place, onDelete: () -> Unit, context: Context = LocalC
     }
 }
 
+@Composable
+fun deleteDialog( viewModel: FavViewModel , place: Place,  onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.height(200.dp),
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DeleteForever,
+                    contentDescription = "Delete Icon",
+                    tint = Color.Red,
+                    modifier = Modifier.size(40.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text =  stringResource(id = R.string.confirm_delete),
+                    fontSize = 20.sp,
+                    style = TextStyle(brush = GradientText()),
+                    fontWeight = FontWeight.Bold)
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row( horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()){
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        Text(text = stringResource(id = R.string.close))
+                    }
+                    Button(
+                        onClick ={
+                            viewModel.viewModelScope.launch {
+                                viewModel.deletePlace(place)
+
+                            }
+                            onDismiss()
+
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        Text(text =stringResource(id = R.string.delete))
+                    }
+                }
+
+            }
+        },
+        confirmButton = {}
+    )
+}
