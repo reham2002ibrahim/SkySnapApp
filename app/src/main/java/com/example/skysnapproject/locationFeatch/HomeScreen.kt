@@ -60,6 +60,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.skysnapproject.dataLayer.models.Place
@@ -187,6 +188,7 @@ fun ErrorScreen(message: String) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
+
     val currentDate =
         remember { SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date()) }
     val currentTime = remember { SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date()) }
@@ -235,10 +237,10 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
                 var context = LocalContext.current
                 val unit = getPreference(context, "units", "Celsius")
                 val unitSymbol = when (unit) {
-                    "Celsius" -> "°C"
-                    "Fahrenheit" -> "°F"
-                    "Kelvin" -> "K"
-                    else -> "°C"
+                    "Celsius" -> stringResource(id = R.string.un_c)
+                    "Fahrenheit" -> stringResource(id = R.string.un_f)
+                    "Kelvin" -> stringResource(id = R.string.un_k)
+                    else -> stringResource(id = R.string.units_c)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
@@ -271,7 +273,7 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
 
             item {
                 Text(
-                    text = "Hourly Forecast",
+                    text = stringResource(id = R.string.home_hourly),
                     fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White
                 )
             }
@@ -280,13 +282,13 @@ fun WeatherContent(weather: CurrentWeather, forecast: Forecast?) {
                 forecast?.let {
                     HourlyForecast(it.list.take(8))
                 } ?: run {
-                    Text("Loading forecast...", color = Color.LightGray)
+                    Text(stringResource(id = R.string.lood_fo), color = Color.LightGray)
                 }
             }
 
             item {
                 Text(
-                    text = "Next 5 Days",
+                    text = stringResource(id = R.string.next_days),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -320,6 +322,8 @@ fun HourlyForecast(hourlyData: List<ForecastItem>) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun HourlyForecastItem(item: ForecastItem) {
+
+    val context = LocalContext.current
     val timeFormat = SimpleDateFormat("h a", Locale.getDefault())
     val time = remember { timeFormat.format(Date(item.dt * 1000L)) }
 
@@ -341,7 +345,14 @@ fun HourlyForecastItem(item: ForecastItem) {
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "${item.main.temp.toInt()}°C", color = Color.White)
+            val unit = getPreference(context, "units", "Celsius")
+            val unitSymbol = when (unit) {
+                "Celsius" -> stringResource(id = R.string.un_c)
+                "Fahrenheit" -> stringResource(id = R.string.un_f)
+                "Kelvin" -> stringResource(id = R.string.un_k)
+                else -> stringResource(id = R.string.units_c)
+            }
+            Text(text = "${item.main.temp.toInt()} $unitSymbol", color = Color.White)
         }
     }
 }
@@ -349,13 +360,15 @@ fun HourlyForecastItem(item: ForecastItem) {
 @Composable
 fun WeatherDetails(weather: CurrentWeather) {
     var  context = LocalContext.current
+    @Composable
     fun windSpeedUnit(speed: Double): String {
         val unitPreference = getPreference(context, "wind_speed_unit", "m/s")
         return when (unitPreference) {
-            "mile/hour" -> String.format("%.3f mph", speed * 2.237)
-            else -> String.format("%.3f m/s", speed)
+            "mile/hour" -> String.format("%.3f %s", speed * 2.237, stringResource(id = R.string.wind_speed_mph))
+            else -> String.format("%.3f %s", speed, stringResource(id = R.string.wind_speed_ms))
         }
     }
+
 
     Card(
         modifier = Modifier
@@ -370,15 +383,17 @@ fun WeatherDetails(weather: CurrentWeather) {
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                WeatherData("    Humidity", "${weather.main.humidity}%")
-                WeatherData("Wind Speed", "${windSpeedUnit(weather.wind.speed)}")
+                WeatherData(stringResource(id = R.string.humidity), "${weather.main.humidity}%")
+                WeatherData(stringResource(id = R.string.wind_speed), "${windSpeedUnit(weather.wind.speed)}")
+
             }
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                WeatherData("Pressure", "${weather.main.pressure} hPa")
-                WeatherData("Clouds", "${weather.clouds.all}%")
+                WeatherData(stringResource(id = R.string.pressure), "${weather.main.pressure} ${stringResource(id = R.string.hpa)}")
+                WeatherData(stringResource(id = R.string.clouds), "${weather.clouds.all} ${stringResource(id = R.string.percent)}")
             }
+
         }
     }
 }

@@ -21,5 +21,20 @@
     <string name="wind_s">meter/sec</string>
     <string name="wind_label">Wind Speed</string>
     <string name="wind_h">mile/hour</string>
+    <string name="splash">Discover weather around you!</string>
+    <string name="un_c">°C</string>
+    <string name="un_f">°F</string>
+    <string name="un_k">°K</string>
+    <string name="home_hourly">Hourly Forecast</string>
+    <string name="lood_fo">Loading forecast...</string>
+    <string name="next_days">Next 5 Days</string>
+    <string name="wind_speed_mph">mph</string>
+    <string name="wind_speed_ms">m/s</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind_speed">Wind Speed</string>
+    <string name="pressure">Pressure</string>
+    <string name="clouds">Clouds</string>
+    <string name="hpa">hPa</string>
+    <string name="percent">%</string>
 
 </resources>

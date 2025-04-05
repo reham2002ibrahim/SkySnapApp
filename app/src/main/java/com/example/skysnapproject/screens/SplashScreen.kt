@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -51,8 +53,9 @@ fun SplashScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(25.dp))
         Text(
-            text = "Discover weather around you!",
+            text = stringResource(id = R.string.splash),
             modifier = Modifier.alpha(alpha.value),
+            style = TextStyle(brush = GradientText()),
             fontSize = 28.sp
         )
     }

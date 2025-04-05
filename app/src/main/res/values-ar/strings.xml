@@ -22,4 +22,19 @@
     <string name="wind_s">متر/ثانيه</string>
     <string name="wind_label">سرعه الرياح</string>
     <string name="wind_h">ملي/ساعه</string>
+    <string name="splash">اكتشف الطقس من حولك!</string>
+    <string name="un_c">"م° "</string>
+    <string name="un_f">"ف° "</string>
+    <string name="un_k">"ك° "</string>
+    <string name="home_hourly">تفاصيل كل ساعه</string>
+    <string name="lood_fo">جاري تحميل التوقعات...</string>
+    <string name="next_days">الخمس ايام القادمين</string>
+    <string name="wind_speed_mph">ميل/الساعة</string>
+    <string name="wind_speed_ms">م/ث</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="pressure">الضغط</string>
+    <string name="clouds">السحب</string>
+    <string name="hpa">هكتوباسكال</string>
+    <string name="percent">%</string>
 </resources>
