@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SkySnap Project</string>
+    <string name="app_name">SkySnap</string>
     <string name="language_english">English</string>
     <string name="language_arabic">Arabic</string>
     <string name="language_label">Language</string>
